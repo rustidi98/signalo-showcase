@@ -11,6 +11,22 @@ integrations with the clinic's existing software.
 it holds patient data and it's a live commercial product. What's here is the story of what it does and
 how it's built.
 
+### Proof, not just prose
+
+Reviewing this to hire? Don't take the prose on faith — here are the artifacts:
+
+| | |
+|---|---|
+| 🧭 **[INTERVIEW_GUIDE.md](./INTERVIEW_GUIDE.md)** | Start here: 5 files, 5 questions, 5 real trade-offs. A fast path for a busy reviewer. |
+| 📐 **[architecture/](./architecture)** | System, recording state machine, auth flow, AI pipeline, deployment — as diagrams (render on GitHub). |
+| 💻 **[sanitized-code/](./sanitized-code)** | Representative extracts of the real code: the stuck-job reaper, device-bound refresh rotation, the LLM coverage guard. |
+| 🔧 **[incidents/](./incidents)** | Postmortems: the false-logout bug that recurred 8× and a GPU pipeline quietly burning money. |
+| 🧪 **[evals/](./evals)** | How a model change is stopped from silently degrading a clinical note — the grading rubric and gates. |
+
+*What's public here / what stays private:* the product source, patient data, and
+live integrations stay private; everything above is sanitized — shapes and
+reasoning are real, client names/hosts/secrets are removed.
+
 ---
 
 ## The problem it solves
