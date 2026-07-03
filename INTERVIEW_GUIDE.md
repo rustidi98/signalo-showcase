@@ -9,8 +9,8 @@ reasoning, and sanitized extracts of the real code.
 
 A production healthcare product — iOS, Android, web, backend, and GPU transcription
 workers — that records a doctor–patient visit and turns it into an honest,
-structured medical note. Built end to end by one person, running in a real clinic
-every day.
+structured medical note. Built end to end by one person, running in a real, paying
+clinic every day.
 
 ## Five files worth two minutes each
 

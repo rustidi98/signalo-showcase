@@ -2,7 +2,7 @@
 
 Signalo records a doctor's visit with a patient, transcribes it, and turns it into a structured medical
 note, coaching feedback for the clinic's coordinators, and analytics for the owner. First market: dental
-clinics. It runs in production, in a real clinic, every day.
+clinics. It runs in production, in a real, paying clinic, every day.
 
 I built it end to end, on my own: the product, the mobile apps, the backend, the AI pipeline, and the
 integrations with the clinic's existing software.
@@ -195,7 +195,7 @@ right way to build.
 - Handling two people talking over each other on a phone call — detecting it and getting the transcript right
 - Keeping a medical note honest when the model wants to invent structure
 - Building an eval harness so swapping a model can't silently make the summaries worse
-- Running production for a real clinic, solo: reliability, being on call, and the privacy bar
+- Running production for a real, paying clinic, solo: reliability, being on call, and the privacy bar
 
 ---
 
