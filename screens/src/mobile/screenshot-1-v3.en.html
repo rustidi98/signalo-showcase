@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<title>Signalo — screenshot 1 v3 · Money (warm canvas)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --bg:#EEF4FB;--card:#FFFFFF;
+    --ink:#0C1B38;--ink2:#2A3A5C;--ink3:#56688A;--ink4:#6B7F9C;
+    --line:rgba(12,27,56,.10);--line2:rgba(12,27,56,.055);
+    --teal:#28C4A4;--tealDeep:#1B9E86;--tealSoftBg:#D8F5EF;--tealInk:#0F4C42;
+    --navy:#1648A0;--navyDeep:#0C2D72;
+    --amberDeep:#B47620;--amberInk:#7A3C20;--amberSoft:rgba(240,197,62,.20);
+  }
+  html,body{width:1080px;height:1920px;overflow:hidden;}
+  body{position:relative;font-family:'Manrope',system-ui,sans-serif;color:var(--ink);
+       background:
+         radial-gradient(76% 50% at 15% 9%, #E4F5EF 0%, rgba(228,245,239,0) 60%),
+         radial-gradient(70% 46% at 90% 15%, #E7EFFB 0%, rgba(231,239,251,0) 62%),
+         radial-gradient(92% 52% at 50% 107%, #F5ECDF 0%, rgba(245,236,223,0) 60%),
+         linear-gradient(178deg, #FBF8F2 0%, #F6F5F1 44%, #F1F5FA 100%);}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  .wave{position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:1;pointer-events:none;}
+
+  .mkt{position:relative;z-index:5;padding:74px 84px 0;text-align:center;}
+  .brand{display:inline-flex;align-items:center;gap:14px;margin-bottom:40px;}
+  .brand .chip{width:54px;height:54px;border-radius:16px;background:#fff;
+               display:flex;align-items:center;justify-content:center;
+               box-shadow:0 10px 24px -12px rgba(20,40,90,.4),0 0 0 1px rgba(12,27,56,.05);}
+  .brand .chip img{width:40px;height:40px;border-radius:10px;}
+  .brand span{font-size:31px;font-weight:700;letter-spacing:-.4px;color:var(--ink);}
+  .mkt h1{font-size:80px;line-height:1.03;font-weight:800;letter-spacing:-2.2px;color:var(--ink);}
+  .mkt h1 em{font-style:normal;color:var(--tealDeep);}
+  .mkt p{margin:22px auto 0;max-width:770px;font-size:30px;line-height:1.34;color:var(--ink3);font-weight:500;}
+
+  .stage{position:absolute;left:0;right:0;top:0;bottom:0;z-index:4;}
+  .ground{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);
+          width:720px;height:130px;border-radius:50%;
+          background:radial-gradient(50% 50% at 50% 50%, rgba(28,54,110,.26), transparent 72%);
+          filter:blur(38px);z-index:3;}
+  .phonewrap{position:absolute;left:50%;top:470px;transform:translateX(-50%);z-index:6;}
+  .phone{position:relative;width:700px;border-radius:60px;
+         background:linear-gradient(150deg,#1b2c4e 0%,#0f1c38 60%,#152848 100%);padding:13px;
+         box-shadow:0 54px 96px -36px rgba(20,42,92,.5),
+                    0 12px 30px -14px rgba(20,42,92,.28),
+                    0 0 0 1px rgba(255,255,255,.55);}
+  .screen{width:674px;height:1240px;border-radius:47px;overflow:hidden;position:relative;background:var(--bg);
+          display:flex;flex-direction:column;}
+  .punch{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:17px;height:17px;border-radius:50%;
+         background:#05101f;z-index:8;}
+  .statusbar{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 38px;
+             font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:600;color:var(--ink2);flex-shrink:0;}
+
+  .phdr{padding:10px 28px 4px;display:flex;align-items:center;gap:16px;flex-shrink:0;}
+  .backbtn{width:54px;height:54px;border-radius:50%;border:1px solid var(--line);background:var(--card);
+           display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--ink3);}
+  .phdr .nm{font-size:28px;font-weight:700;color:var(--ink);letter-spacing:-.4px;}
+  .phdr .sb{font-size:18px;color:var(--ink3);margin-top:1px;}
+
+  .bd{flex:1;padding:18px 24px 0;display:flex;flex-direction:column;gap:14px;overflow:hidden;}
+
+  .cta{flex-shrink:0;padding:14px 24px 22px;
+       background:linear-gradient(to top,var(--bg) 62%, rgba(238,244,251,0));}
+  .cta .btn{height:80px;border-radius:24px;display:flex;align-items:center;justify-content:center;gap:12px;
+            font-size:25px;font-weight:700;color:#fff;letter-spacing:-.2px;
+            background:linear-gradient(135deg,#28C4A4,#1B9E86);
+            box-shadow:0 18px 34px -16px rgba(27,158,134,.75);}
+  .cta .btn .ar{font-size:26px;}
+
+  .leads{background:var(--card);border:1px solid var(--line2);border-radius:20px;padding:16px 18px;flex-shrink:0;
+         display:flex;align-items:center;gap:26px;}
+  .leads .k{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;letter-spacing:1.5px;color:var(--ink4);}
+  .leads .who{display:flex;align-items:center;gap:11px;}
+  .leads .av{width:38px;height:38px;border-radius:50%;background:#E8EFF9;display:flex;align-items:center;justify-content:center;
+             font-size:15px;font-weight:700;color:var(--navy);}
+  .leads .who .r{font-size:15px;color:var(--ink3);}
+  .leads .who .n{font-size:18px;font-weight:600;color:var(--ink);}
+
+  .pot{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px;flex-shrink:0;
+       box-shadow:0 20px 46px -26px rgba(20,42,92,.32);}
+  .p-head{display:flex;align-items:center;gap:9px;}
+  .p-head .tt{font-size:26px;font-weight:700;color:var(--ink);letter-spacing:-.3px;}
+  .p-head .sr{font-size:19px;font-weight:500;color:var(--ink3);}
+  .p-head .flames{margin-left:auto;display:flex;gap:3px;}
+  .p-head .flames svg{width:22px;height:26px;}
+  .p-tags{display:flex;align-items:center;gap:10px;margin-top:11px;}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;letter-spacing:.3px;
+       padding:4px 11px;border-radius:50px;}
+  .tag.est{color:var(--ink3);background:rgba(12,27,56,.06);}
+  .p-tags .date{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:var(--ink3);}
+
+  .p-range{display:flex;align-items:baseline;gap:10px;margin-top:16px;
+           padding:16px 18px;background:var(--tealSoftBg);border-radius:16px;}
+  .p-range .rng{font-size:31px;font-weight:700;color:var(--ink);letter-spacing:-.6px;}
+  .p-range .obs{font-size:17px;font-weight:500;color:var(--tealInk);}
+
+  .p-item{margin-top:12px;padding:16px 16px;background:var(--bg);border:1px solid var(--line2);border-radius:16px;}
+  .p-item .row{display:flex;align-items:flex-start;gap:12px;}
+  .p-item .need{font-size:22px;font-weight:600;color:var(--ink);line-height:1.18;}
+  .p-item .svc{font-size:18px;font-weight:500;color:var(--ink3);margin-top:2px;line-height:1.2;}
+  .p-item .pr{margin-left:auto;font-size:22px;font-weight:600;color:var(--ink);white-space:nowrap;}
+  .p-item .q{font-size:18px;font-style:italic;color:var(--ink3);margin-top:9px;line-height:1.32;}
+  .p-item .conf{display:flex;align-items:center;gap:7px;margin-top:11px;}
+  .p-item .conf .cl{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:var(--ink3);}
+  .p-item .conf .d{width:8px;height:8px;border-radius:50%;background:var(--line);}
+  .p-item .conf .d.on{background:var(--tealDeep);}
+  .p-disc{font-size:16px;color:var(--ink4);margin-top:14px;line-height:1.32;}
+
+  .hist{flex-shrink:0;padding-top:2px;}
+  .hist .hh{display:flex;align-items:baseline;gap:10px;padding:0 2px 12px;}
+  .hist .hh .t{font-size:24px;font-weight:700;color:var(--ink);letter-spacing:-.3px;}
+  .hist .hh .c{font-size:18px;color:var(--ink3);}
+  .hist .hrow{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line2);
+              border-radius:18px;padding:18px 18px;margin-bottom:10px;}
+  .hist .hrow .dot{width:12px;height:12px;border-radius:50%;background:var(--navy);flex-shrink:0;}
+  .hist .hrow .dot.t{background:var(--tealDeep);}
+  .hist .hrow .ht{flex:1;font-size:19px;font-weight:600;color:var(--ink);}
+  .hist .hrow .hm{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--ink3);}
+
+  .conn{position:absolute;z-index:8;pointer-events:none;}
+  .flyout{position:absolute;z-index:9;left:4px;top:756px;width:228px;
+          background:#fff;border:1px solid rgba(12,27,56,.06);border-radius:22px;
+          padding:18px 18px 16px;box-shadow:0 40px 74px -28px rgba(20,42,92,.5);}
+  .flyout .k{display:flex;align-items:center;gap:8px;}
+  .flyout .k .tag{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.2px;
+                  color:var(--ink3);background:rgba(12,27,56,.06);padding:4px 10px;border-radius:50px;}
+  .flyout .k .fl{margin-left:auto;display:flex;gap:2px;}
+  .flyout .k .fl svg{width:15px;height:18px;}
+  .flyout .band{margin-top:12px;padding:14px 14px;background:var(--tealSoftBg);border-radius:14px;}
+  .flyout .band .v{font-size:29px;font-weight:800;letter-spacing:-1px;color:var(--ink);line-height:1.08;white-space:nowrap;}
+  .flyout .band .o{font-size:15px;font-weight:600;color:var(--tealInk);margin-top:7px;}
+  .flyout .cap{font-size:15px;color:var(--ink3);margin-top:11px;line-height:1.26;}
+</style>
+</head>
+<body>
+  <svg class="wave" viewBox="0 0 1080 1920" fill="none">
+    <defs>
+      <linearGradient id="wg" x1="0" y1="0" x2="1080" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#28C4A4" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#28C4A4" stop-opacity=".72"/>
+        <stop offset="1" stop-color="#1B9E86" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="wglow" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="7"/></filter>
+    </defs>
+    <path d="M -80 900 C 140 1070, 320 1180, 540 1120 S 900 1000, 1160 900"
+          stroke="#28C4A4" stroke-opacity=".16" stroke-width="14" filter="url(#wglow)"/>
+    <path d="M -80 900 C 140 1070, 320 1180, 540 1120 S 900 1000, 1160 900"
+          stroke="url(#wg)" stroke-width="4" stroke-linecap="round"/>
+  </svg>
+
+  <header class="mkt">
+    <div class="brand">
+      <span class="chip"><img src="../brand-icon.png" alt="Signalo"/></span>
+      <span>Signalo</span>
+    </div>
+    <h1>Money on the table —<br><em>made visible</em></h1>
+    <p>The AI estimates treatment potential from the visit conversation</p>
+  </header>
+
+  <div class="stage">
+    <div class="ground"></div>
+    <div class="phonewrap">
+      <div class="phone">
+        <div class="punch"></div>
+        <div class="screen">
+          <div class="statusbar"><span>9:41</span><span>5G ▮▮▮ 84%</span></div>
+          <div class="phdr">
+            <div class="backbtn">‹</div>
+            <div><div class="nm">Rustem I.</div><div class="sb">Patient card</div></div>
+          </div>
+          <div class="bd">
+            <div class="leads">
+              <span class="k">CARE TEAM</span>
+              <span class="who"><span class="av">AD</span><span><span class="r">Treating doctor</span><br><span class="n">Dr. D. Akhmetova</span></span></span>
+              <span class="who"><span class="av">SL</span><span><span class="r">Curator</span><br><span class="n">L. Safina</span></span></span>
+            </div>
+
+            <div class="pot">
+              <div class="p-head">
+                <span class="tt">Discussed potential</span>
+                <span class="sr">· from the conversation</span>
+                <span class="flames">
+                  <svg viewBox="0 0 16 19" fill="#B47620"><path d="M8.4 0c.7 3.3-1.4 4.9-2.9 6.7C4.2 8.4 3.3 10 3.3 12c0 3.7 2.3 6.7 5.1 6.7s5.1-3 5.1-6.7c0-1.7-.6-3.2-1.7-4.5-.4 1.1-1.3 1.9-2.4 2.2C10.4 7 9.4 4.2 8.4 0Z"/></svg>
+                  <svg viewBox="0 0 16 19" fill="#B47620"><path d="M8.4 0c.7 3.3-1.4 4.9-2.9 6.7C4.2 8.4 3.3 10 3.3 12c0 3.7 2.3 6.7 5.1 6.7s5.1-3 5.1-6.7c0-1.7-.6-3.2-1.7-4.5-.4 1.1-1.3 1.9-2.4 2.2C10.4 7 9.4 4.2 8.4 0Z"/></svg>
+                  <svg viewBox="0 0 16 19" fill="#B47620"><path d="M8.4 0c.7 3.3-1.4 4.9-2.9 6.7C4.2 8.4 3.3 10 3.3 12c0 3.7 2.3 6.7 5.1 6.7s5.1-3 5.1-6.7c0-1.7-.6-3.2-1.7-4.5-.4 1.1-1.3 1.9-2.4 2.2C10.4 7 9.4 4.2 8.4 0Z"/></svg>
+                </span>
+              </div>
+              <div class="p-tags">
+                <span class="tag est">estimate</span>
+                <span class="date">21 Jun</span>
+              </div>
+              <div class="p-range">
+                <span class="rng">≈ $28,000 – $32,000</span>
+                <span class="obs">· discussed</span>
+              </div>
+              <div class="p-item">
+                <div class="row">
+                  <div><div class="need">Fixed full-arch prosthetics</div>
+                       <div class="svc">ALL-ON-4 prosthetics, zirconia (Straumann)</div></div>
+                  <div class="pr">≈ $28,000</div>
+                </div>
+                <div class="q">“Ready to invest to do it once and for good — quote everything turnkey plus an installment option.”</div>
+                <div class="conf"><span class="cl">confidence</span><span class="d on"></span><span class="d on"></span><span class="d on"></span></div>
+              </div>
+              <div class="p-item">
+                <div class="row">
+                  <div><div class="need">Bone grafting before implants</div>
+                       <div class="svc">Open sinus lift</div></div>
+                  <div class="pr">≈ $4,000</div>
+                </div>
+                <div class="q">“If implants can't go in without it — let's do it, I don't want to drag this out.”</div>
+                <div class="conf"><span class="cl">confidence</span><span class="d on"></span><span class="d on"></span><span class="d"></span></div>
+              </div>
+              <div class="p-disc">An estimate from the conversation — not confirmed revenue and not a treatment plan.</div>
+            </div>
+
+            <div class="hist">
+              <div class="hh"><span class="t">Visit history</span><span class="c">5</span></div>
+              <div class="hrow"><span class="dot t"></span><span class="ht">Prosthodontist consultation</span><span class="hm">21 Jun · 34 min</span></div>
+              <div class="hrow"><span class="dot"></span><span class="ht">Exam &amp; X-ray</span><span class="hm">6 Jun · 18 min</span></div>
+            </div>
+          </div>
+          <div class="cta"><div class="btn">Start visit <span class="ar">→</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <svg class="conn" style="left:214px;top:1150px;width:64px;height:40px" viewBox="0 0 64 40" fill="none">
+      <path d="M2 20 C 28 20, 34 20, 60 20" stroke="#1B9E86" stroke-width="2.6" stroke-dasharray="2 7" stroke-linecap="round"/>
+      <circle cx="4" cy="20" r="5.5" fill="#1B9E86"/>
+    </svg>
+    <div class="flyout" style="top:1058px;width:250px;">
+      <div class="k">
+        <span class="tag">patient's words</span>
+      </div>
+      <div class="band" style="background:#EEF4FB;">
+        <div class="v" style="font-size:20px;font-weight:700;line-height:1.26;letter-spacing:-.2px;font-style:italic;white-space:normal;">“Ready to invest to do it once&nbsp;and for&nbsp;good.”</div>
+      </div>
+      <div class="cap">The AI heard this during the visit — the potential is estimated from these words</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -29,6 +29,32 @@ reasoning are real, client names/hosts/secrets are removed.
 
 ---
 
+## The product, in screens
+
+Nine screens from the production mobile app — localized to English for this showcase (the product ships in Russian for its market). Demo data throughout; no real patient information.
+
+<table>
+<tr>
+<td width="33%" align="center"><img src="screens/mobile/02-recording.png" width="240"><br><b>Record the visit</b><br><sub>The doctor speaks; the structured note writes itself. Resumable, survives a dropped connection.</sub></td>
+<td width="33%" align="center"><img src="screens/mobile/06-visit-summary.png" width="240"><br><b>Finished in minutes</b><br><sub>A visit summary, the doctor's note, and the full transcript — ready right after the visit.</sub></td>
+<td width="33%" align="center"><img src="screens/mobile/03-patient-card.png" width="240"><br><b>One card</b><br><sub>Visits, calls and the clinic's EMR — dental chart, treatment plans, delivered services — unified.</sub></td>
+</tr>
+<tr>
+<td width="33%" align="center"><img src="screens/mobile/01-money.png" width="240"><br><b>Money on the table</b><br><sub>AI estimates treatment potential from the conversation — with the patient's own words as evidence.</sub></td>
+<td width="33%" align="center"><img src="screens/mobile/05-calls.png" width="240"><br><b>Calls in the card</b><br><sub>Phone touchpoints parsed by AI — topic, type, outcome — and pushed back to the CRM.</sub></td>
+<td width="33%" align="center"><img src="screens/mobile/04-growth.png" width="240"><br><b>Coaching that lands</b><br><sub>Per-clinician: where a consult loses the patient, and a ready phrase for next time.</sub></td>
+</tr>
+<tr>
+<td width="33%" align="center"><img src="screens/mobile/07-clinic-day.png" width="240"><br><b>The clinic day</b><br><sub>The schedule with attendance statuses and filters — the day at a glance.</sub></td>
+<td width="33%" align="center"><img src="screens/mobile/08-ask-clinic.png" width="240"><br><b>Ask the clinic</b><br><sub>An external AI (Claude, ChatGPT) answers live clinic questions through a read-only connector.</sub></td>
+<td width="33%" align="center"><img src="screens/mobile/09-security.png" width="240"><br><b>Healthcare-grade</b><br><sub>Data residency, on-device encryption, role-based access — and it records only what was said.</sub></td>
+</tr>
+</table>
+
+<sub>Reproducible: the English screen sources live in <a href="screens/src/mobile/"><code>screens/src/mobile/</code></a>.</sub>
+
+---
+
 ## The problem it solves
 
 A clinic loses two things it can never get back: what was actually said in the room, and why a lead

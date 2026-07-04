@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<title>Signalo — screenshot 2 v3 · Recording (warm canvas)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --bg:#EEF4FB;--card:#FFFFFF;
+    --ink:#0C1B38;--ink2:#2A3A5C;--ink3:#56688A;--ink4:#6B7F9C;
+    --line:rgba(12,27,56,.10);
+    --teal:#28C4A4;--tealDeep:#1B9E86;--navy:#1648A0;--navyDeep:#0C2D72;
+  }
+  html,body{width:1080px;height:1920px;overflow:hidden;}
+  body{position:relative;font-family:'Manrope',system-ui,sans-serif;color:var(--ink);
+       background:
+         radial-gradient(76% 50% at 85% 9%, #E4F5EF 0%, rgba(228,245,239,0) 60%),
+         radial-gradient(70% 46% at 10% 15%, #E7EFFB 0%, rgba(231,239,251,0) 62%),
+         radial-gradient(92% 52% at 50% 107%, #F5ECDF 0%, rgba(245,236,223,0) 60%),
+         linear-gradient(178deg, #FBF8F2 0%, #F6F5F1 44%, #F1F5FA 100%);}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  .wave{position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:1;pointer-events:none;}
+
+  .mkt{position:relative;z-index:5;padding:74px 84px 0;text-align:center;}
+  .brand{display:inline-flex;align-items:center;gap:14px;margin-bottom:40px;}
+  .brand .chip{width:54px;height:54px;border-radius:16px;background:#fff;
+               display:flex;align-items:center;justify-content:center;
+               box-shadow:0 10px 24px -12px rgba(20,40,90,.4),0 0 0 1px rgba(12,27,56,.05);}
+  .brand .chip img{width:40px;height:40px;border-radius:10px;}
+  .brand span{font-size:31px;font-weight:700;letter-spacing:-.4px;color:var(--ink);}
+  .mkt h1{font-size:80px;line-height:1.03;font-weight:800;letter-spacing:-2.2px;color:var(--ink);}
+  .mkt h1 em{font-style:normal;color:var(--tealDeep);}
+  .mkt p{margin:22px auto 0;max-width:770px;font-size:30px;line-height:1.34;color:var(--ink3);font-weight:500;}
+
+  .stage{position:absolute;left:0;right:0;top:0;bottom:0;z-index:4;}
+  .ground{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);
+          width:700px;height:130px;border-radius:50%;
+          background:radial-gradient(50% 50% at 50% 50%, rgba(28,54,110,.26), transparent 72%);
+          filter:blur(38px);z-index:3;}
+  .phonewrap{position:absolute;left:50%;top:470px;transform:translateX(-50%);z-index:6;}
+  .phone{position:relative;width:700px;border-radius:60px;
+         background:linear-gradient(150deg,#1b2c4e 0%,#0f1c38 60%,#152848 100%);padding:13px;
+         box-shadow:0 54px 96px -36px rgba(20,42,92,.5),
+                    0 12px 30px -14px rgba(20,42,92,.28),
+                    0 0 0 1px rgba(255,255,255,.55);}
+  .screen{width:674px;height:1240px;border-radius:47px;overflow:hidden;position:relative;}
+  .punch{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:17px;height:17px;border-radius:50%;
+         background:#05101f;z-index:8;}
+
+  .recscreen{width:100%;height:100%;background:linear-gradient(162deg,#1A4FA8 0%,#0C2D72 48%,#061838 100%);
+             display:flex;flex-direction:column;padding:0 40px 42px;color:#fff;}
+  .sbar{height:50px;display:flex;align-items:center;justify-content:space-between;
+        font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:600;color:rgba(255,255,255,.85);flex-shrink:0;}
+  .rc-top{display:flex;align-items:center;justify-content:space-between;margin-top:16px;}
+  .rc-top .pname{font-size:26px;font-weight:600;color:#fff;}
+  .rc-rec{display:flex;align-items:center;gap:12px;}
+  .rc-dot{width:16px;height:16px;border-radius:50%;background:#FF5A47;box-shadow:0 0 18px 3px rgba(255,90,71,.6);}
+  .rc-rec .mono{font-size:25px;font-weight:600;letter-spacing:3px;color:#fff;}
+  .rc-mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .rc-timer{font-size:134px;font-weight:500;letter-spacing:-2.6px;color:#fff;font-variant-numeric:tabular-nums;
+            text-shadow:0 6px 36px rgba(0,0,0,.32);}
+  .rc-wave{display:flex;align-items:center;gap:6px;height:164px;width:500px;margin-top:22px;}
+  .rc-wave i{flex:1;border-radius:50px;background:linear-gradient(to top,var(--teal),#eafff9);}
+  .rc-meta{display:flex;align-items:center;gap:15px;margin-bottom:26px;}
+  .rc-meta .mdot{width:13px;height:13px;border-radius:50%;background:var(--teal);}
+  .rc-meta .mlbl{font-size:21px;color:rgba(255,255,255,.72);}
+  .rc-meta .mseg{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:18px;color:rgba(255,255,255,.55);}
+  .rc-ctrls{display:flex;gap:20px;}
+  .rc-bt{flex:1;height:96px;border-radius:26px;display:flex;align-items:center;justify-content:center;font-size:27px;font-weight:600;}
+  .rc-pause{background:rgba(15,42,92,.7);border:2px solid rgba(255,255,255,.85);color:#fff;}
+  .rc-stop{background:#fff;color:var(--ink);box-shadow:0 12px 28px -12px rgba(0,0,0,.5);}
+
+  .resultchip{position:absolute;z-index:15;left:36px;right:36px;bottom:360px;
+              display:flex;align-items:center;gap:17px;
+              background:rgba(255,255,255,.97);border:1px solid rgba(255,255,255,.7);border-radius:22px;
+              padding:19px 23px;box-shadow:0 24px 50px -20px rgba(6,24,56,.6);}
+  .resultchip .ico{width:52px;height:52px;flex-shrink:0;border-radius:15px;
+                   background:linear-gradient(135deg,var(--teal),var(--tealDeep));
+                   display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px -8px rgba(27,158,134,.8);}
+  .resultchip .ico svg{width:28px;height:28px;}
+  .resultchip .tx{font-size:23px;font-weight:700;color:var(--ink);letter-spacing:-.3px;line-height:1.15;}
+  .resultchip .tx span{display:block;font-size:17px;font-weight:500;color:var(--ink3);margin-top:3px;letter-spacing:0;}
+
+  .conn{position:absolute;z-index:8;pointer-events:none;}
+  .flyout{position:absolute;z-index:9;right:22px;top:626px;width:322px;
+          background:#fff;border:1px solid rgba(12,27,56,.06);border-radius:24px;
+          padding:22px 24px;box-shadow:0 40px 74px -28px rgba(20,42,92,.5);}
+  .flyout .k{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;letter-spacing:1px;color:var(--tealDeep);}
+  .flyout .v{font-size:54px;font-weight:800;letter-spacing:-1.8px;color:var(--ink);margin-top:6px;line-height:1;}
+  .flyout .arrow{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:20px;font-weight:600;color:var(--ink2);}
+  .flyout .arrow .ar{color:var(--tealDeep);font-size:23px;}
+</style>
+</head>
+<body>
+  <svg class="wave" viewBox="0 0 1080 1920" fill="none">
+    <defs>
+      <linearGradient id="wg" x1="0" y1="0" x2="1080" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#28C4A4" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#28C4A4" stop-opacity=".72"/>
+        <stop offset="1" stop-color="#1B9E86" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="wglow" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="7"/></filter>
+    </defs>
+    <path d="M -80 900 C 140 1070, 320 1180, 540 1120 S 900 1000, 1160 900"
+          stroke="#28C4A4" stroke-opacity=".16" stroke-width="14" filter="url(#wglow)"/>
+    <path d="M -80 900 C 140 1070, 320 1180, 540 1120 S 900 1000, 1160 900"
+          stroke="url(#wg)" stroke-width="4" stroke-linecap="round"/>
+  </svg>
+
+  <header class="mkt">
+    <div class="brand">
+      <span class="chip"><img src="../brand-icon.png" alt="Signalo"/></span>
+      <span>Signalo</span>
+    </div>
+    <h1>The doctor speaks —<br><em>the note writes itself</em></h1>
+    <p>12 minutes of the visit → a finished note in the card</p>
+  </header>
+
+  <div class="stage">
+    <div class="ground"></div>
+    <div class="phonewrap">
+      <div class="phone">
+        <div class="punch"></div>
+        <div class="screen">
+          <div class="recscreen">
+            <div class="sbar"><span>9:41</span><span>5G ▮▮▮ 84%</span></div>
+            <div class="rc-top">
+              <div class="pname">Rustem I.</div>
+              <div class="rc-rec"><span class="rc-dot"></span><span class="mono">REC</span></div>
+            </div>
+            <div class="rc-mid">
+              <div class="rc-timer">12:48</div>
+              <div class="rc-wave" id="wave"></div>
+            </div>
+            <div class="rc-meta">
+              <span class="mdot"></span>
+              <span class="mlbl">Recording to the cloud</span>
+              <span class="mseg">7 seg.</span>
+            </div>
+            <div class="rc-ctrls">
+              <div class="rc-bt rc-pause">Pause</div>
+              <div class="rc-bt rc-stop">Finish</div>
+            </div>
+          </div>
+          <div class="resultchip">
+            <div class="ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 5h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2"/>
+                <path d="M9 3.5h6v3H9z"/>
+                <path d="M9.5 13.5l1.8 1.8 3.4-3.6"/>
+              </svg>
+            </div>
+            <div class="tx">The card fills in<span>automatically from the conversation</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <svg class="conn" style="right:326px;top:706px;width:150px;height:120px" viewBox="0 0 150 120" fill="none">
+      <path d="M146 12 C 94 12, 70 96, 8 104" stroke="#1B9E86" stroke-width="2.6" stroke-dasharray="2 7" stroke-linecap="round"/>
+      <circle cx="144" cy="12" r="5.5" fill="#1B9E86"/>
+    </svg>
+    <div class="flyout">
+      <div class="k">VISIT</div>
+      <div class="v">12 min</div>
+      <div class="arrow"><span class="ar">→</span> a finished note in the card</div>
+    </div>
+  </div>
+<script>
+  var w=document.getElementById('wave');
+  var heights=[18,30,44,58,40,70,86,62,48,92,74,55,38,66,80,52,44,30,58,72,90,68,46,34,60,82,70,50,38,64];
+  heights.forEach(function(h){var b=document.createElement('i');b.style.height=Math.max(h,8)+'%';w.appendChild(b);});
+</script>
+</body>
+</html>

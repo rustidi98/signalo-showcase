@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<title>Signalo — screenshot 3 v3 · One card (warm canvas)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --bg:#EEF4FB;--card:#FFFFFF;
+    --ink:#0C1B38;--ink2:#2A3A5C;--ink3:#56688A;--ink4:#6B7F9C;
+    --line:rgba(12,27,56,.10);--line2:rgba(12,27,56,.055);
+    --teal:#28C4A4;--tealDeep:#1B9E86;--tealSoftBg:#D8F5EF;--tealInk:#0F4C42;
+    --navy:#1648A0;--navyDeep:#0C2D72;--navySoft:#E8EFF9;
+    --rec:#D64C3D;--recSoft:rgba(214,76,61,.13);
+    --amber:#D49D2B;--amberDeep:#B47620;--amberInk:#7A3C20;--amberSoft:rgba(240,197,62,.20);
+  }
+  html,body{width:1080px;height:1920px;overflow:hidden;}
+  body{position:relative;font-family:'Manrope',system-ui,sans-serif;color:var(--ink);
+       background:
+         radial-gradient(76% 50% at 15% 9%, #E4F5EF 0%, rgba(228,245,239,0) 60%),
+         radial-gradient(70% 46% at 90% 15%, #E7EFFB 0%, rgba(231,239,251,0) 62%),
+         radial-gradient(92% 52% at 50% 107%, #F5ECDF 0%, rgba(245,236,223,0) 60%),
+         linear-gradient(178deg, #FBF8F2 0%, #F6F5F1 44%, #F1F5FA 100%);}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .wave{position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:1;pointer-events:none;}
+
+  .mkt{position:relative;z-index:5;padding:74px 84px 0;text-align:center;}
+  .brand{display:inline-flex;align-items:center;gap:14px;margin-bottom:40px;}
+  .brand .chip{width:54px;height:54px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;
+               box-shadow:0 10px 24px -12px rgba(20,40,90,.4),0 0 0 1px rgba(12,27,56,.05);}
+  .brand .chip img{width:40px;height:40px;border-radius:10px;}
+  .brand span{font-size:31px;font-weight:700;letter-spacing:-.4px;color:var(--ink);}
+  .mkt h1{font-size:72px;line-height:1.05;font-weight:800;letter-spacing:-2px;color:var(--ink);}
+  .mkt h1 em{font-style:normal;color:var(--tealDeep);}
+  .mkt p{margin:22px auto 0;max-width:800px;font-size:29px;line-height:1.34;color:var(--ink3);font-weight:500;}
+
+  .stage{position:absolute;left:0;right:0;top:0;bottom:0;z-index:4;}
+  .ground{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);width:720px;height:130px;border-radius:50%;
+          background:radial-gradient(50% 50% at 50% 50%, rgba(28,54,110,.26), transparent 72%);filter:blur(38px);z-index:3;}
+  .phonewrap{position:absolute;left:50%;top:470px;transform:translateX(-50%);z-index:6;}
+  .phone{position:relative;width:700px;border-radius:60px;background:linear-gradient(150deg,#1b2c4e 0%,#0f1c38 60%,#152848 100%);padding:13px;
+         box-shadow:0 54px 96px -36px rgba(20,42,92,.5),0 12px 30px -14px rgba(20,42,92,.28),0 0 0 1px rgba(255,255,255,.55);}
+  .screen{width:674px;height:1240px;border-radius:47px;overflow:hidden;position:relative;background:var(--bg);display:flex;flex-direction:column;}
+  .punch{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:17px;height:17px;border-radius:50%;background:#05101f;z-index:8;}
+  .statusbar{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 38px;
+             font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:600;color:var(--ink2);flex-shrink:0;}
+
+  .phdr{padding:8px 26px 2px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .phdr .back{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600;letter-spacing:1px;color:var(--ink3);}
+  .finpill{font-size:16px;font-weight:600;color:var(--tealDeep);padding:7px 15px;border:1.5px solid rgba(40,196,164,.4);border-radius:999px;}
+
+  .bd{flex:1;padding:8px 24px 0;display:flex;flex-direction:column;gap:16px;overflow:hidden;}
+
+  .phead{display:flex;align-items:center;gap:16px;}
+  .phead .av{width:66px;height:66px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+             background:linear-gradient(140deg,var(--navy),var(--navyDeep));color:#fff;font-size:24px;font-weight:600;letter-spacing:.4px;
+             box-shadow:0 14px 26px -12px rgba(22,72,160,.6);}
+  .phead .nm{font-size:33px;font-weight:600;letter-spacing:-.6px;color:var(--ink);line-height:1.05;}
+  .phead .mt{font-size:18px;color:var(--ink3);margin-top:5px;}
+  .phead .mt b{font-weight:700;color:var(--ink);}
+
+  .mis{display:flex;align-items:center;gap:12px;padding:16px 18px;background:var(--navySoft);
+       border:1px solid rgba(22,72,160,.30);border-radius:16px;}
+  .mis .ic{font-size:20px;color:var(--navy);}
+  .mis .t{flex:1;font-size:19px;font-weight:700;color:var(--navy);letter-spacing:-.2px;}
+  .mis .ch{font-size:16px;font-weight:700;color:var(--navy);}
+
+  .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
+  .sh .tt{font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-.2px;}
+  .src{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;}
+  .src.ident{color:var(--navyDeep);background:var(--navySoft);}
+  .src.signalo{color:var(--tealInk);background:var(--tealSoftBg);}
+
+  .sect{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px 18px;
+        box-shadow:0 18px 40px -28px rgba(20,42,92,.28);}
+  .hint{font-size:15px;color:var(--ink3);line-height:1.34;margin-bottom:12px;}
+  .hint b{font-weight:700;color:var(--ink2);}
+
+  .arches{display:flex;flex-direction:column;gap:6px;}
+  .arch{display:flex;gap:3px;align-items:stretch;}
+  .agap{width:12px;flex:none;}
+  .tooth{flex:1;height:44px;position:relative;border-radius:5px 5px 8px 8px;border:1.5px solid var(--line);
+         background:var(--card);display:flex;align-items:flex-end;justify-content:center;}
+  .tooth span{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--ink3);margin-bottom:3px;}
+  .tooth.caries{background:rgba(214,76,61,.14);border-color:rgba(214,76,61,.45);}
+  .tooth.caries span{color:#9B2D22;}
+  .tooth.implant{background:rgba(40,196,164,.16);border-color:var(--teal);}
+  .tooth.implant span{color:var(--tealDeep);}
+  .tooth.crown{border:2px solid var(--amber);}
+  .tooth.crown span{color:var(--amberDeep);}
+  .tooth.filling span{color:var(--navy);}
+  .tooth.filling .dot{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:var(--navy);}
+  .tooth.missing{background:#EEF1F6;border-style:dashed;}
+  .tooth.missing span{color:var(--ink4);text-decoration:line-through;}
+  .tooth.plan{background:var(--card);border-style:dashed;border-color:var(--tealDeep);
+              background-image:repeating-linear-gradient(45deg,rgba(40,196,164,.20) 0 2px,transparent 2px 6px);}
+  .tooth.plan span{color:var(--tealDeep);}
+  .tooth.plan .pdot{position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;
+                    background:var(--card);border:1.5px solid var(--tealDeep);}
+
+  .legend{margin-top:14px;padding-top:13px;border-top:1px solid var(--line);}
+  .honesty{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+  .hrow{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--ink2);line-height:1.25;}
+  .hrow b{font-weight:700;}
+  .sw{width:18px;height:18px;border-radius:5px;flex-shrink:0;border:1.5px solid var(--teal);background:var(--tealSoftBg);}
+  .sw.hatch{background:var(--card);background-image:repeating-linear-gradient(45deg,rgba(40,196,164,.28) 0 2px,transparent 2px 6px);border-style:dashed;}
+  .legrid{display:grid;grid-template-columns:1fr 1fr;gap:9px 16px;}
+  .li{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--ink2);}
+  .lsw{width:15px;height:15px;border-radius:4px;flex-shrink:0;border:1.5px solid var(--line);background:var(--card);position:relative;}
+
+  .seg{display:flex;gap:0;padding:4px;background:rgba(12,27,56,.055);border-radius:15px;margin-bottom:12px;}
+  .seg .s{flex:1;text-align:center;padding:11px 0;font-size:17px;font-weight:700;color:var(--ink3);border-radius:12px;display:flex;align-items:center;justify-content:center;gap:7px;}
+  .seg .s .c{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;opacity:.6;}
+  .seg .s.on{background:linear-gradient(#fff,#F7FAFE);color:var(--ink);box-shadow:0 3px 8px -3px rgba(12,27,56,.22);}
+  .plan{background:var(--card);border:1px solid rgba(40,196,164,.45);border-radius:16px;padding:16px 16px;}
+  .plan .r1{display:flex;align-items:center;gap:10px;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.3px;padding:3px 10px;border-radius:999px;
+         color:var(--tealInk);background:var(--tealSoftBg);}
+  .plan .pn{font-size:19px;font-weight:600;color:var(--ink);flex:1;letter-spacing:-.2px;}
+  .plan .sum{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;color:var(--navyDeep);}
+  .plan .au{font-size:16px;font-weight:600;color:var(--ink2);margin-top:8px;}
+  .plan .au span{font-weight:500;color:var(--ink3);}
+  .plan .pc{font-size:16px;color:var(--ink3);margin-top:5px;}
+
+  .svc{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line2);}
+  .svc:last-child{border-bottom:none;}
+  .svc .sd{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--ink3);width:66px;flex-shrink:0;}
+  .svc .sn{flex:1;font-size:18px;color:var(--ink);}
+  .svc .tch{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--navyDeep);background:var(--navySoft);padding:2px 8px;border-radius:6px;}
+
+  .flyout{position:absolute;z-index:9;left:6px;top:990px;width:260px;
+          background:#fff;border:1px solid rgba(12,27,56,.06);border-radius:22px;padding:18px 18px 16px;
+          box-shadow:0 40px 74px -28px rgba(20,42,92,.5);}
+  .flyout .fk{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.5px;color:var(--ink3);margin-bottom:12px;line-height:1.3;}
+  .srcrow{display:flex;align-items:center;gap:9px;margin-bottom:9px;}
+  .srcdot{width:22px;height:22px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;}
+  .srcdot svg{width:13px;height:13px;}
+  .srcrow .l{font-size:16px;font-weight:600;color:var(--ink);}
+  .srcrow .s{font-size:13px;color:var(--ink3);margin-left:auto;}
+  .merge{margin-top:12px;padding:11px 13px;background:var(--tealSoftBg);border-radius:13px;display:flex;align-items:center;gap:9px;}
+  .merge .ar{font-size:20px;color:var(--tealDeep);}
+  .merge .m{font-size:16px;font-weight:700;color:var(--tealInk);}
+  .conn{position:absolute;z-index:8;pointer-events:none;}
+</style>
+</head>
+<body>
+  <svg class="wave" viewBox="0 0 1080 1920" fill="none">
+    <defs>
+      <linearGradient id="wg" x1="0" y1="0" x2="1080" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#28C4A4" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#28C4A4" stop-opacity=".72"/>
+        <stop offset="1" stop-color="#1B9E86" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="wglow" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="7"/></filter>
+    </defs>
+    <path d="M -80 900 C 140 1070, 320 1180, 540 1120 S 900 1000, 1160 900" stroke="#28C4A4" stroke-opacity=".16" stroke-width="14" filter="url(#wglow)"/>
+    <path d="M -80 900 C 140 1070, 320 1180, 540 1120 S 900 1000, 1160 900" stroke="url(#wg)" stroke-width="4" stroke-linecap="round"/>
+  </svg>
+
+  <header class="mkt">
+    <div class="brand">
+      <span class="chip"><img src="../brand-icon.png" alt="Signalo"/></span>
+      <span>Signalo</span>
+    </div>
+    <h1>Visits, calls, EMR —<br><em>one card</em></h1>
+    <p>Signalo enriches the profile from every source at once</p>
+  </header>
+
+  <div class="stage">
+    <div class="ground"></div>
+    <div class="phonewrap">
+      <div class="phone">
+        <div class="punch"></div>
+        <div class="screen">
+          <div class="statusbar"><span>9:41</span><span>5G ▮▮▮ 84%</span></div>
+          <div class="phdr">
+            <div class="back">← BACK</div>
+            <div class="finpill">✓ Finish visit</div>
+          </div>
+          <div class="bd">
+            <div class="phead">
+              <div class="av">IR</div>
+              <div>
+                <div class="nm">Rustem I.</div>
+                <div class="mt">34 y.o. · card № <b>4827</b></div>
+              </div>
+            </div>
+
+            <div class="mis">
+              <span class="ic">▤</span>
+              <span class="t">Open the full patient card</span>
+              <span class="ch">›</span>
+            </div>
+
+            <div>
+              <div class="sh"><span class="tt">Dental chart</span><span class="src ident">iDent</span></div>
+              <div class="sect">
+                <div class="hint">Tap a tooth — diagnoses, plan and what was actually done. <b>We don't invent status.</b></div>
+                <div class="arches" id="arches"></div>
+                <div class="legend">
+                  <div class="honesty">
+                    <div class="hrow"><span class="sw"></span><span><b>Solid color</b> — confirmed by fact</span></div>
+                    <div class="hrow"><span class="sw hatch"></span><span><b>Hatched</b> — planned only</span></div>
+                  </div>
+                  <div class="legrid">
+                    <div class="li"><span class="lsw" style="background:rgba(214,76,61,.14);border-color:rgba(214,76,61,.45)"></span>Caries</div>
+                    <div class="li"><span class="lsw" style="background:rgba(40,196,164,.16);border-color:#28C4A4"></span>Implant</div>
+                    <div class="li"><span class="lsw" style="border:2px solid #D49D2B"></span>Crown</div>
+                    <div class="li"><span class="lsw"><i style="position:absolute;top:2.5px;left:4.5px;width:5px;height:5px;border-radius:50%;background:#1648A0"></i></span>Filling</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="sh"><span class="tt">Treatment plans</span><span class="src ident">iDent</span></div>
+              <div class="seg">
+                <div class="s on">In progress <span class="c">2</span></div>
+                <div class="s">Completed <span class="c">5</span></div>
+                <div class="s">Other <span class="c">3</span></div>
+              </div>
+              <div class="plan">
+                <div class="r1">
+                  <span class="badge">IN PROGRESS</span>
+                  <span class="pn">Implant placement 2.6, 4.6</span>
+                  <span class="sum">≈ $11,000</span>
+                </div>
+                <div class="au">Created by Dr. D. Akhmetova <span>· 21 June 2026</span></div>
+                <div class="pc">Procedures: 4</div>
+              </div>
+            </div>
+
+            <div>
+              <div class="sh"><span class="tt">Delivered services</span><span class="src ident">iDent</span></div>
+              <div class="sect" style="padding:4px 16px;">
+                <div class="svc"><span class="sd">21 May</span><span class="sn">Pulpitis treatment, canal</span><span class="tch">36</span></div>
+                <div class="svc"><span class="sd">6 Jun</span><span class="sn">Professional cleaning, Air&nbsp;Flow</span></div>
+                <div class="svc"><span class="sd">6 Jun</span><span class="sn">Periapical X-ray</span><span class="tch">26</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <svg class="conn" style="left:768px;top:892px;width:70px;height:44px" viewBox="0 0 70 44" fill="none">
+      <path d="M64 22 C 38 22, 30 22, 6 22" stroke="#1B9E86" stroke-width="2.6" stroke-dasharray="2 7" stroke-linecap="round"/>
+      <circle cx="64" cy="22" r="5.5" fill="#1B9E86"/>
+    </svg>
+    <div class="flyout" style="left:auto;right:2px;top:818px;width:228px;">
+      <div class="fk">ONE CARD — FROM EVERY<br>SOURCE AT ONCE</div>
+      <div class="srcrow">
+        <span class="srcdot" style="background:linear-gradient(135deg,#28C4A4,#1B9E86)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M12 4v10m0 0l-3.5-3.5M12 14l3.5-3.5"/><path d="M5 19h14"/></svg>
+        </span>
+        <span class="l">Visit</span><span class="s">Signalo</span>
+      </div>
+      <div class="srcrow">
+        <span class="srcdot" style="background:linear-gradient(135deg,#1648A0,#0C2D72)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5l2 4-2 2c1 2.5 3 4.5 5.5 5.5l2-2 4 2v3c0 1-.8 1.8-1.8 1.6C10 22 4 16 3.4 8.3 3.3 7.3 4 6.5 5 6.5"/></svg>
+        </span>
+        <span class="l">Telephony</span><span class="s">CRM</span>
+      </div>
+      <div class="srcrow">
+        <span class="srcdot" style="background:linear-gradient(135deg,#1648A0,#0C2D72)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+        </span>
+        <span class="l">iDent</span><span class="s">EMR</span>
+      </div>
+      <div class="merge"><span class="ar">↓</span><span class="m">patient card</span></div>
+    </div>
+  </div>
+
+<script>
+  var upperR=[18,17,16,15,14,13,12,11], upperL=[21,22,23,24,25,26,27,28];
+  var lowerR=[48,47,46,45,44,43,42,41], lowerL=[31,32,33,34,35,36,37,38];
+  var state={16:'crown',26:'implant',24:'filling',36:'caries',46:'filling',47:'missing',25:'plan',44:'filling'};
+  var root=document.getElementById('arches');
+  function row(right,left){
+    var r=document.createElement('div');r.className='arch';
+    function cell(f){
+      var d=document.createElement('div');d.className='tooth '+(state[f]||'');
+      if((state[f]||'')==='filling'){var dot=document.createElement('i');dot.className='dot';d.appendChild(dot);}
+      if((state[f]||'')==='plan'){var pd=document.createElement('i');pd.className='pdot';d.appendChild(pd);}
+      var s=document.createElement('span');s.textContent=f;d.appendChild(s);return d;
+    }
+    right.forEach(function(f){r.appendChild(cell(f));});
+    var g=document.createElement('div');g.className='agap';r.appendChild(g);
+    left.forEach(function(f){r.appendChild(cell(f));});
+    return r;
+  }
+  root.appendChild(row(upperR,upperL));
+  root.appendChild(row(lowerR,lowerL));
+</script>
+</body>
+</html>

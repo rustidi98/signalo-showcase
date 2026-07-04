@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<title>Signalo — screenshot 9 v3 · In Russia, encrypted</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --bg:#EEF4FB;--card:#FFFFFF;
+    --ink:#0C1B38;--ink2:#2A3A5C;--ink3:#56688A;--ink4:#6B7F9C;
+    --line:rgba(12,27,56,.10);--line2:rgba(12,27,56,.055);
+    --teal:#28C4A4;--tealDeep:#1B9E86;--tealSoft:#D8F5EF;--tealInk:#0F4C42;
+    --navy:#1648A0;--navyDeep:#0C2D72;--navySoft:#E8EFF9;
+    --amberDeep:#B47620;--amberSoft:rgba(240,197,62,.20);
+  }
+  html,body{width:1080px;height:1920px;overflow:hidden;}
+  body{position:relative;font-family:'Manrope',system-ui,sans-serif;color:var(--ink);
+       background:
+         radial-gradient(76% 50% at 15% 9%, #E4F5EF 0%, rgba(228,245,239,0) 60%),
+         radial-gradient(70% 46% at 90% 15%, #E7EFFB 0%, rgba(231,239,251,0) 62%),
+         radial-gradient(92% 52% at 50% 107%, #F5ECDF 0%, rgba(245,236,223,0) 60%),
+         linear-gradient(178deg, #FBF8F2 0%, #F6F5F1 44%, #F1F5FA 100%);}
+  .wave{position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:1;pointer-events:none;}
+
+  .mkt{position:relative;z-index:5;padding:74px 84px 0;text-align:center;}
+  .brand{display:inline-flex;align-items:center;gap:14px;margin-bottom:40px;}
+  .brand .chip{width:54px;height:54px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;
+               box-shadow:0 10px 24px -12px rgba(20,40,90,.4),0 0 0 1px rgba(12,27,56,.05);}
+  .brand .chip img{width:40px;height:40px;border-radius:10px;}
+  .brand span{font-size:31px;font-weight:700;letter-spacing:-.4px;color:var(--ink);}
+  .mkt h1{font-size:80px;line-height:1.03;font-weight:800;letter-spacing:-2.2px;color:var(--ink);}
+  .mkt h1 em{font-style:normal;color:var(--tealDeep);}
+  .mkt p{margin:22px auto 0;max-width:800px;font-size:29px;line-height:1.34;color:var(--ink3);font-weight:500;}
+
+  .bento{position:absolute;left:50%;top:560px;transform:translateX(-50%);width:900px;z-index:5;
+         display:flex;flex-direction:column;gap:22px;}
+
+  .hero{position:relative;overflow:hidden;background:linear-gradient(150deg,#12386f 0%,#0C2D72 60%,#08214f 100%);
+        border-radius:32px;padding:44px 46px;display:flex;align-items:center;gap:34px;
+        box-shadow:0 40px 80px -34px rgba(12,45,114,.6),0 0 0 1px rgba(255,255,255,.06);}
+  .hero .glow{position:absolute;width:420px;height:420px;border-radius:50%;right:-120px;top:-160px;
+              background:radial-gradient(circle,rgba(40,196,164,.34) 0%,rgba(40,196,164,0) 70%);}
+  .shield{position:relative;width:132px;height:150px;flex-shrink:0;filter:drop-shadow(0 18px 30px rgba(0,0,0,.35));}
+  .hero .htx{position:relative;}
+  .hero .ht{font-size:44px;font-weight:800;letter-spacing:-1px;color:#fff;line-height:1.08;}
+  .hero .hs{font-size:24px;color:rgba(255,255,255,.78);margin-top:12px;line-height:1.4;}
+  .hero .hchips{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;}
+  .hero .hc{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;color:#CFF3EA;
+            background:rgba(40,196,164,.18);border:1px solid rgba(95,224,194,.42);padding:9px 16px;border-radius:999px;}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  .fact{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:30px 30px;
+        box-shadow:0 26px 54px -34px rgba(20,42,92,.34);}
+  .fact .ic{width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+  .fact .ic.teal{background:var(--tealSoft);} .fact .ic.navy{background:var(--navySoft);}
+  .fact .ic svg{width:34px;height:34px;}
+  .fact .ic .rf{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:var(--navyDeep);}
+  .fact .ft{font-size:28px;font-weight:700;color:var(--ink);letter-spacing:-.4px;line-height:1.12;}
+  .fact .fs{font-size:21px;color:var(--ink3);line-height:1.42;margin-top:11px;}
+
+  .wide{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:28px 32px;
+        display:flex;align-items:center;gap:24px;box-shadow:0 26px 54px -34px rgba(20,42,92,.34);}
+  .wide .ic{width:60px;height:60px;border-radius:16px;flex-shrink:0;background:var(--tealSoft);display:flex;align-items:center;justify-content:center;}
+  .wide .ic svg{width:32px;height:32px;}
+  .wide .wt{font-size:27px;font-weight:700;color:var(--ink);letter-spacing:-.3px;}
+  .wide .ws{font-size:20px;color:var(--ink3);line-height:1.4;margin-top:6px;}
+</style>
+</head>
+<body>
+  <svg class="wave" viewBox="0 0 1080 1920" fill="none">
+    <defs>
+      <linearGradient id="wg" x1="0" y1="0" x2="1080" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#28C4A4" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#28C4A4" stop-opacity=".72"/>
+        <stop offset="1" stop-color="#1B9E86" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="wglow" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="7"/></filter>
+    </defs>
+    <path d="M -80 900 C 140 1070, 320 1180, 540 1120 S 900 1000, 1160 900" stroke="#28C4A4" stroke-opacity=".16" stroke-width="14" filter="url(#wglow)"/>
+    <path d="M -80 900 C 140 1070, 320 1180, 540 1120 S 900 1000, 1160 900" stroke="url(#wg)" stroke-width="4" stroke-linecap="round"/>
+  </svg>
+
+  <header class="mkt">
+    <div class="brand">
+      <span class="chip"><img src="../brand-icon.png" alt="Signalo"/></span>
+      <span>Signalo</span>
+    </div>
+    <h1>In Russia,<br><em>encrypted</em></h1>
+    <p>Medical data — protected by law and encryption</p>
+  </header>
+
+  <div class="bento">
+    <div class="hero">
+      <div class="glow"></div>
+      <svg class="shield" viewBox="0 0 132 150" fill="none">
+        <defs>
+          <linearGradient id="sh" x1="0" y1="0" x2="132" y2="150" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#34D6B4"/><stop offset="1" stop-color="#1648A0"/>
+          </linearGradient>
+        </defs>
+        <path d="M66 4 L124 28 V74 C124 112 98 138 66 148 C34 138 8 112 8 74 V28 Z" fill="url(#sh)"/>
+        <path d="M66 4 L124 28 V74 C124 112 98 138 66 148 C34 138 8 112 8 74 V28 Z" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2"/>
+        <rect x="46" y="66" width="40" height="34" rx="7" fill="#fff"/>
+        <path d="M53 66 V56 a13 13 0 0 1 26 0 V66" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="66" cy="82" r="5.5" fill="#0C2D72"/>
+        <rect x="63.5" y="84" width="5" height="9" rx="2.5" fill="#0C2D72"/>
+      </svg>
+      <div class="htx">
+        <div class="ht">Patient data<br>under lock</div>
+        <div class="hs">Stored in Russia, encrypted on the device, access by role only.</div>
+        <div class="hchips">
+          <span class="hc">152-FZ</span>
+          <span class="hc">Stored in Russia</span>
+          <span class="hc">Medical confidentiality</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="fact">
+        <div class="ic navy"><span class="rf">RU</span></div>
+        <div class="ft">Stored in Russia</div>
+        <div class="fs">Servers in Russia, no cross-border data transfer.</div>
+      </div>
+      <div class="fact">
+        <div class="ic teal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1B9E86" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="10.5" width="16" height="11" rx="2.5"/><path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5"/><circle cx="12" cy="16" r="1.4" fill="#1B9E86"/>
+          </svg>
+        </div>
+        <div class="ft">On-device encryption</div>
+        <div class="fs">Access keys never leave the staff member's phone.</div>
+      </div>
+      <div class="fact">
+        <div class="ic navy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1648A0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8.5" cy="9" r="3"/><circle cx="16" cy="10" r="2.4"/><path d="M3.5 19c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/><path d="M14.5 19c0-1.8 1-3.2 2.8-3.6"/>
+          </svg>
+        </div>
+        <div class="ft">Role-based access</div>
+        <div class="fs">A doctor sees their own; a manager sees the summary. Others' growth points stay private.</div>
+      </div>
+      <div class="fact">
+        <div class="ic teal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1B9E86" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 4.5l5 5L9 20l-5.2 1.2L5 16z"/><path d="M12.5 6.5l5 5"/>
+          </svg>
+        </div>
+        <div class="ft">The doctor authors the card</div>
+        <div class="fs">Edits live only in the change history. Nothing can be changed quietly.</div>
+      </div>
+    </div>
+
+    <div class="wide">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1B9E86" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l7.5 3v5c0 4.6-3.2 7.9-7.5 9.3C7.7 18.9 4.5 15.6 4.5 11V6z"/><path d="M9 12l2 2 4-4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="wt">The AI records only what was said</div>
+        <div class="ws">No inventions: only what was said in the visit or call goes into the card.</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

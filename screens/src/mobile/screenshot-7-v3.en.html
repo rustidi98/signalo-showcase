@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<title>Signalo — screenshot 7 v3 · Clinic schedule</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --bg:#EEF4FB;--card:#FFFFFF;
+    --ink:#0C1B38;--ink2:#2A3A5C;--ink3:#56688A;--ink4:#6B7F9C;
+    --line:rgba(12,27,56,.10);--line2:rgba(12,27,56,.055);
+    --teal:#28C4A4;--tealDeep:#1B9E86;--tealSoft:#D8F5EF;--tealInk:#0F4C42;
+    --navy:#1648A0;--navyDeep:#0C2D72;--navySoft:#E8EFF9;
+    --amber:#D49D2B;--amberDeep:#B47620;--amberInk:#7A3C20;--amberSoft:rgba(240,197,62,.20);
+    --red:#C0392B;
+  }
+  html,body{width:1080px;height:1920px;overflow:hidden;}
+  body{position:relative;font-family:'Manrope',system-ui,sans-serif;color:var(--ink);
+       background:
+         radial-gradient(76% 50% at 15% 9%, #E4F5EF 0%, rgba(228,245,239,0) 60%),
+         radial-gradient(70% 46% at 90% 15%, #E7EFFB 0%, rgba(231,239,251,0) 62%),
+         radial-gradient(92% 52% at 50% 107%, #F5ECDF 0%, rgba(245,236,223,0) 60%),
+         linear-gradient(178deg, #FBF8F2 0%, #F6F5F1 44%, #F1F5FA 100%);}
+  .wave{position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:1;pointer-events:none;}
+
+  .mkt{position:relative;z-index:5;padding:74px 84px 0;text-align:center;}
+  .brand{display:inline-flex;align-items:center;gap:14px;margin-bottom:40px;}
+  .brand .chip{width:54px;height:54px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;
+               box-shadow:0 10px 24px -12px rgba(20,40,90,.4),0 0 0 1px rgba(12,27,56,.05);}
+  .brand .chip img{width:40px;height:40px;border-radius:10px;}
+  .brand span{font-size:31px;font-weight:700;letter-spacing:-.4px;color:var(--ink);}
+  .mkt h1{font-size:70px;line-height:1.05;font-weight:800;letter-spacing:-1.9px;color:var(--ink);}
+  .mkt h1 em{font-style:normal;color:var(--tealDeep);}
+  .mkt p{margin:22px auto 0;max-width:810px;font-size:29px;line-height:1.34;color:var(--ink3);font-weight:500;}
+
+  .stage{position:absolute;left:0;right:0;top:0;bottom:0;z-index:4;}
+  .ground{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);width:720px;height:130px;border-radius:50%;
+          background:radial-gradient(50% 50% at 50% 50%, rgba(28,54,110,.26), transparent 72%);filter:blur(38px);z-index:3;}
+  .phonewrap{position:absolute;left:50%;top:470px;transform:translateX(-50%);z-index:6;}
+  .phone{position:relative;width:700px;border-radius:60px;background:linear-gradient(150deg,#1b2c4e 0%,#0f1c38 60%,#152848 100%);padding:13px;
+         box-shadow:0 54px 96px -36px rgba(20,42,92,.5),0 12px 30px -14px rgba(20,42,92,.28),0 0 0 1px rgba(255,255,255,.55);}
+  .screen{width:674px;height:1240px;border-radius:47px;overflow:hidden;position:relative;background:var(--bg);display:flex;flex-direction:column;}
+  .punch{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:17px;height:17px;border-radius:50%;background:#05101f;z-index:8;}
+  .statusbar{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 38px;
+             font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:600;color:var(--ink2);flex-shrink:0;}
+
+  .bd{flex:1;padding:14px 24px 0;display:flex;flex-direction:column;overflow:hidden;}
+  .hd{display:flex;align-items:flex-start;gap:12px;}
+  .hd .eye{font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:1px;color:var(--ink3);text-transform:uppercase;}
+  .hd .ttl{font-size:34px;font-weight:800;letter-spacing:-.7px;color:var(--ink);margin-top:3px;}
+  .hd .sub{font-size:17px;color:var(--ink3);margin-top:3px;}
+  .hicons{margin-left:auto;display:flex;gap:9px;}
+  .hi{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--ink3);
+      background:var(--card);border:1px solid var(--line);position:relative;}
+  .hi.on{color:var(--tealDeep);background:var(--tealSoft);border-color:rgba(40,196,164,.4);}
+  .hi .dt{position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;background:var(--tealDeep);}
+
+  .vtabs{display:flex;gap:8px;margin-top:16px;}
+  .vt{font-size:17px;font-weight:600;color:var(--ink3);padding:9px 17px;border-radius:999px;background:var(--card);border:1px solid var(--line);}
+  .vt.on{color:#fff;background:var(--navy);border-color:var(--navy);}
+  .vt.plus{color:var(--ink4);padding:9px 15px;}
+
+  .daybar{display:flex;align-items:baseline;gap:9px;margin-top:18px;margin-bottom:12px;}
+  .daybar .t{font-size:20px;font-weight:600;color:var(--ink);}
+  .daybar .c{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--ink3);margin-left:auto;}
+
+  .rows{display:flex;flex-direction:column;gap:12px;}
+  .row{display:flex;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;}
+  .row.mine{border-color:rgba(40,196,164,.32);}
+  .acc{width:5px;flex-shrink:0;}
+  .acc.teal{background:var(--teal);} .acc.amber{background:var(--amber);} .acc.grey{background:var(--line);} .acc.red{background:rgba(192,57,43,.6);}
+  .rin{flex:1;display:flex;align-items:center;gap:14px;padding:15px 16px;}
+  .tcol{width:64px;flex-shrink:0;text-align:center;}
+  .tcol .tm{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:600;color:var(--ink);}
+  .tcol .vt2{font-size:13px;font-weight:600;margin-top:2px;}
+  .tcol .vt2.p{color:var(--tealDeep);} .tcol .vt2.s{color:var(--ink4);}
+  .tcol .du{font-size:13px;color:var(--ink4);margin-top:2px;font-family:'JetBrains Mono',monospace;}
+  .ncol{flex:1;min-width:0;}
+  .nrow{display:flex;align-items:flex-start;gap:9px;}
+  .nrow .nm{font-size:20px;font-weight:600;letter-spacing:-.2px;color:var(--ink);line-height:1.12;flex:1;}
+  .att{font-size:13px;font-weight:600;padding:4px 11px;border-radius:999px;white-space:nowrap;flex-shrink:0;}
+  .att.came{color:var(--tealInk);background:var(--tealSoft);}
+  .att.live{color:var(--amberInk);background:var(--amberSoft);}
+  .att.plan{color:var(--ink3);background:rgba(12,27,56,.06);}
+  .att.canc{color:#9B2D22;background:rgba(192,57,43,.1);}
+  .leads{display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap;}
+  .lm{display:flex;align-items:center;gap:5px;font-size:15px;color:var(--ink2);}
+  .lm .ic{font-size:13px;}
+  .lm.doc .ic{color:var(--navy);} .lm.cur .ic{color:var(--tealDeep);}
+  .sep{color:var(--ink4);}
+  .unasg{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:600;color:var(--amberInk);padding:3px 10px;background:var(--amberSoft);border-radius:999px;}
+  .chev{font-size:18px;color:var(--ink4);flex-shrink:0;}
+  .canctag{display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:600;color:#9B2D22;margin-top:8px;padding:3px 9px;background:rgba(192,57,43,.08);border-radius:999px;}
+
+  .flyout{position:absolute;z-index:9;right:4px;top:560px;width:260px;
+          background:#fff;border:1px solid rgba(12,27,56,.06);border-radius:22px;padding:18px 18px 16px;
+          box-shadow:0 40px 74px -28px rgba(20,42,92,.5);}
+  .flyout .fk{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.5px;color:var(--ink3);margin-bottom:13px;}
+  .fchips{display:flex;flex-wrap:wrap;gap:8px;}
+  .fc{font-size:16px;font-weight:600;color:var(--ink2);padding:7px 13px;border-radius:999px;background:var(--bg);border:1px solid var(--line);}
+  .fc.on{color:#fff;background:var(--navy);border-color:var(--navy);}
+  .fnote{margin-top:13px;padding:12px 14px;background:var(--tealSoft);border-radius:13px;font-size:16px;font-weight:700;color:var(--tealInk);line-height:1.3;}
+  .conn{position:absolute;z-index:8;pointer-events:none;}
+</style>
+</head>
+<body>
+  <svg class="wave" viewBox="0 0 1080 1920" fill="none">
+    <defs>
+      <linearGradient id="wg" x1="0" y1="0" x2="1080" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#28C4A4" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#28C4A4" stop-opacity=".72"/>
+        <stop offset="1" stop-color="#1B9E86" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="wglow" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="7"/></filter>
+    </defs>
+    <path d="M -80 900 C 140 1070, 320 1180, 540 1120 S 900 1000, 1160 900" stroke="#28C4A4" stroke-opacity=".16" stroke-width="14" filter="url(#wglow)"/>
+    <path d="M -80 900 C 140 1070, 320 1180, 540 1120 S 900 1000, 1160 900" stroke="url(#wg)" stroke-width="4" stroke-linecap="round"/>
+  </svg>
+
+  <header class="mkt">
+    <div class="brand">
+      <span class="chip"><img src="../brand-icon.png" alt="Signalo"/></span>
+      <span>Signalo</span>
+    </div>
+    <h1>The clinic schedule —<br><em>under control</em></h1>
+    <p>The clinic's whole day: visits, doctors, attendance</p>
+  </header>
+
+  <div class="stage">
+    <div class="ground"></div>
+    <div class="phonewrap">
+      <div class="phone">
+        <div class="punch"></div>
+        <div class="screen">
+          <div class="statusbar"><span>9:41</span><span>5G ▮▮▮ 84%</span></div>
+          <div class="bd">
+            <div class="hd">
+              <div>
+                <div class="eye">Wednesday · 21 June</div>
+                <div class="ttl">Clinic day</div>
+                <div class="sub">6 patients left for today</div>
+              </div>
+              <div class="hicons">
+                <div class="hi">⌕</div>
+                <div class="hi on">☰<span class="dt"></span></div>
+              </div>
+            </div>
+
+            <div class="vtabs">
+              <div class="vt">Mine &amp; new</div>
+              <div class="vt on">All patients</div>
+              <div class="vt plus">＋</div>
+            </div>
+
+            <div class="daybar"><span class="t">Today</span><span class="c">14 patients</span></div>
+
+            <div class="rows">
+              <div class="row mine">
+                <div class="acc teal"></div>
+                <div class="rin">
+                  <div class="tcol"><div class="tm">09:00</div><div class="vt2 p">New</div><div class="du">45 min</div></div>
+                  <div class="ncol">
+                    <div class="nrow"><span class="nm">Rustem I.</span><span class="att came">Arrived</span></div>
+                    <div class="leads"><span class="lm doc"><span class="ic">◈</span>Dr. Akhmetova</span><span class="sep">·</span><span class="lm cur"><span class="ic">◔</span>L. Safina</span></div>
+                  </div>
+                  <span class="chev">›</span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="acc amber"></div>
+                <div class="rin">
+                  <div class="tcol"><div class="tm">10:30</div><div class="vt2 s">Repeat</div><div class="du">30 min</div></div>
+                  <div class="ncol">
+                    <div class="nrow"><span class="nm">Gulnara Valieva</span><span class="att live">In visit</span></div>
+                    <div class="leads"><span class="lm doc"><span class="ic">◈</span>Dr. Akhmetova</span><span class="sep">·</span><span class="unasg">＋ unassigned</span></div>
+                  </div>
+                  <span class="chev">›</span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="acc grey"></div>
+                <div class="rin">
+                  <div class="tcol"><div class="tm">12:00</div><div class="vt2 p">New</div><div class="du">60 min</div></div>
+                  <div class="ncol">
+                    <div class="nrow"><span class="nm">Pyotr Sidorov</span><span class="att plan">Scheduled</span></div>
+                    <div class="leads"><span class="lm doc"><span class="ic">◈</span>Dr. Garipov</span><span class="sep">·</span><span class="lm cur"><span class="ic">◔</span>L. Safina</span></div>
+                  </div>
+                  <span class="chev">›</span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="acc red"></div>
+                <div class="rin">
+                  <div class="tcol"><div class="tm">13:15</div><div class="vt2 s">Repeat</div><div class="du">20 min</div></div>
+                  <div class="ncol">
+                    <div class="nrow"><span class="nm">Alsu Akhmetzyanova</span><span class="att canc">Cancelled</span></div>
+                    <div class="canctag">✕ Sick · moved to next week</div>
+                  </div>
+                  <span class="chev">›</span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="acc teal"></div>
+                <div class="rin">
+                  <div class="tcol"><div class="tm">15:00</div><div class="vt2 p">New</div><div class="du">45 min</div></div>
+                  <div class="ncol">
+                    <div class="nrow"><span class="nm">Maria Kovaleva</span><span class="att came">Arrived</span></div>
+                    <div class="leads"><span class="lm doc"><span class="ic">◈</span>Dr. Garipov</span><span class="sep">·</span><span class="lm cur"><span class="ic">◔</span>L. Safina</span></div>
+                  </div>
+                  <span class="chev">›</span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="acc grey"></div>
+                <div class="rin">
+                  <div class="tcol"><div class="tm">16:30</div><div class="vt2 s">Repeat</div><div class="du">30 min</div></div>
+                  <div class="ncol">
+                    <div class="nrow"><span class="nm">Artem Nikitin</span><span class="att plan">Scheduled</span></div>
+                    <div class="leads"><span class="lm doc"><span class="ic">◈</span>Dr. Akhmetova</span><span class="sep">·</span><span class="lm cur"><span class="ic">◔</span>L. Safina</span></div>
+                  </div>
+                  <span class="chev">›</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <svg class="conn" style="right:264px;top:568px;width:60px;height:120px" viewBox="0 0 60 120" fill="none">
+      <path d="M52 108 C 20 108, 34 20, 12 8" stroke="#1B9E86" stroke-width="2.6" stroke-dasharray="2 7" stroke-linecap="round"/>
+      <circle cx="52" cy="108" r="5.5" fill="#1B9E86"/>
+    </svg>
+    <div class="flyout">
+      <div class="fk">SEARCH &amp; FILTER</div>
+      <div class="fchips">
+        <span class="fc on">Doctor</span>
+        <span class="fc">Curator</span>
+        <span class="fc">Attendance</span>
+        <span class="fc">No curator</span>
+        <span class="fc">First visits</span>
+      </div>
+      <div class="fnote">See who has no curator and who hasn't arrived yet</div>
+    </div>
+  </div>
+</body>
+</html>

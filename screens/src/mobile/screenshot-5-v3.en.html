@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<title>Signalo — screenshot 5 v3 · Calls in the card</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --bg:#EEF4FB;--card:#FFFFFF;
+    --ink:#0C1B38;--ink2:#2A3A5C;--ink3:#56688A;--ink4:#6B7F9C;
+    --line:rgba(12,27,56,.10);--line2:rgba(12,27,56,.055);
+    --teal:#28C4A4;--tealDeep:#1B9E86;--tealSoft:#D8F5EF;--tealInk:#0F4C42;
+    --navy:#1648A0;--navyDeep:#0C2D72;--navySoft:#E8EFF9;
+    --amberDeep:#B47620;--amberInk:#7A3C20;--amberSoft:rgba(240,197,62,.20);
+  }
+  html,body{width:1080px;height:1920px;overflow:hidden;}
+  body{position:relative;font-family:'Manrope',system-ui,sans-serif;color:var(--ink);
+       background:
+         radial-gradient(76% 50% at 15% 9%, #E4F5EF 0%, rgba(228,245,239,0) 60%),
+         radial-gradient(70% 46% at 90% 15%, #E7EFFB 0%, rgba(231,239,251,0) 62%),
+         radial-gradient(92% 52% at 50% 107%, #F5ECDF 0%, rgba(245,236,223,0) 60%),
+         linear-gradient(178deg, #FBF8F2 0%, #F6F5F1 44%, #F1F5FA 100%);}
+  .wave{position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:1;pointer-events:none;}
+
+  .mkt{position:relative;z-index:5;padding:74px 84px 0;text-align:center;}
+  .brand{display:inline-flex;align-items:center;gap:14px;margin-bottom:40px;}
+  .brand .chip{width:54px;height:54px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;
+               box-shadow:0 10px 24px -12px rgba(20,40,90,.4),0 0 0 1px rgba(12,27,56,.05);}
+  .brand .chip img{width:40px;height:40px;border-radius:10px;}
+  .brand span{font-size:31px;font-weight:700;letter-spacing:-.4px;color:var(--ink);}
+  .mkt h1{font-size:78px;line-height:1.04;font-weight:800;letter-spacing:-2.1px;color:var(--ink);}
+  .mkt h1 em{font-style:normal;color:var(--tealDeep);}
+  .mkt p{margin:22px auto 0;max-width:800px;font-size:29px;line-height:1.34;color:var(--ink3);font-weight:500;}
+
+  .stage{position:absolute;left:0;right:0;top:0;bottom:0;z-index:4;}
+  .ground{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);width:720px;height:130px;border-radius:50%;
+          background:radial-gradient(50% 50% at 50% 50%, rgba(28,54,110,.26), transparent 72%);filter:blur(38px);z-index:3;}
+  .phonewrap{position:absolute;left:50%;top:470px;transform:translateX(-50%);z-index:6;}
+  .phone{position:relative;width:700px;border-radius:60px;background:linear-gradient(150deg,#1b2c4e 0%,#0f1c38 60%,#152848 100%);padding:13px;
+         box-shadow:0 54px 96px -36px rgba(20,42,92,.5),0 12px 30px -14px rgba(20,42,92,.28),0 0 0 1px rgba(255,255,255,.55);}
+  .screen{width:674px;height:1240px;border-radius:47px;overflow:hidden;position:relative;background:var(--bg);display:flex;flex-direction:column;}
+  .punch{position:absolute;top:22px;left:50%;transform:translateX(-50%);width:17px;height:17px;border-radius:50%;background:#05101f;z-index:8;}
+  .statusbar{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 38px;
+             font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:600;color:var(--ink2);flex-shrink:0;}
+
+  .phdr{padding:8px 26px 4px;display:flex;align-items:center;gap:14px;flex-shrink:0;}
+  .back{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600;letter-spacing:1px;color:var(--ink3);}
+  .phdr .nm{font-size:24px;font-weight:700;color:var(--ink);}
+  .phdr .sb{font-size:16px;color:var(--ink3);}
+
+  .tabs{display:flex;gap:0;padding:0 26px;flex-shrink:0;border-bottom:1px solid var(--line);}
+  .tabs .tb{flex:1;text-align:center;padding:14px 0 12px;font-size:18px;font-weight:500;color:var(--ink3);position:relative;}
+  .tabs .tb.on{font-weight:700;color:var(--ink);}
+  .tabs .tb.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--tealDeep);border-radius:3px;}
+
+  .bd{flex:1;padding:18px 26px 0;display:flex;flex-direction:column;gap:14px;overflow:hidden;}
+  .sh{display:flex;align-items:center;justify-content:space-between;}
+  .sh .k{font-family:'JetBrains Mono',monospace;font-size:15px;letter-spacing:1px;color:var(--ink3);}
+  .crm{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--navyDeep);background:var(--navySoft);padding:3px 10px;border-radius:999px;}
+
+  .touch{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px 18px;}
+  .touch .r1{display:flex;align-items:center;gap:11px;}
+  .dir{width:34px;height:34px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;}
+  .dir.in{background:var(--navySoft);color:var(--navyDeep);}
+  .dir.out{background:var(--tealSoft);color:var(--tealDeep);}
+  .touch .ct{font-size:21px;font-weight:700;color:var(--ink);flex:1;letter-spacing:-.2px;}
+  .touch .cv{font-size:18px;color:var(--ink3);}
+  .touch .meta{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--ink3);margin-top:11px;line-height:1.35;}
+  .touch .badges{display:flex;gap:8px;margin-top:12px;}
+  .bdg{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;padding:4px 11px;border-radius:999px;}
+  .bdg.crm{color:var(--navyDeep);background:var(--navySoft);}
+  .bdg.proc{color:var(--navyDeep);background:var(--navySoft);}
+  .touch .out{font-size:18px;color:var(--ink2);line-height:1.42;margin-top:14px;padding-top:14px;border-top:1px solid var(--line2);}
+  .touch.open{border-color:rgba(40,196,164,.4);box-shadow:0 20px 44px -26px rgba(20,42,92,.32);}
+
+  .flyout{position:absolute;z-index:9;right:4px;top:640px;width:262px;
+          background:#fff;border:1px solid rgba(12,27,56,.06);border-radius:22px;padding:18px 18px 16px;
+          box-shadow:0 40px 74px -28px rgba(20,42,92,.5);}
+  .flyout .fk{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.5px;color:var(--ink3);margin-bottom:12px;}
+  .frow{display:flex;flex-direction:column;gap:10px;}
+  .fi{display:flex;gap:9px;align-items:flex-start;}
+  .fi .kk{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.5px;color:var(--ink4);width:56px;flex-shrink:0;padding-top:2px;}
+  .fi .vv{font-size:16px;font-weight:600;color:var(--ink);line-height:1.28;}
+  .famo{margin-top:14px;padding:12px 14px;background:var(--navySoft);border-radius:13px;display:flex;align-items:center;gap:9px;}
+  .famo .ar{font-size:19px;color:var(--navy);}
+  .famo .m{font-size:16px;font-weight:700;color:var(--navyDeep);}
+  .conn{position:absolute;z-index:8;pointer-events:none;}
+</style>
+</head>
+<body>
+  <svg class="wave" viewBox="0 0 1080 1920" fill="none">
+    <defs>
+      <linearGradient id="wg" x1="0" y1="0" x2="1080" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#28C4A4" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#28C4A4" stop-opacity=".72"/>
+        <stop offset="1" stop-color="#1B9E86" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="wglow" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="7"/></filter>
+    </defs>
+    <path d="M -80 900 C 140 1070, 320 1180, 540 1120 S 900 1000, 1160 900" stroke="#28C4A4" stroke-opacity=".16" stroke-width="14" filter="url(#wglow)"/>
+    <path d="M -80 900 C 140 1070, 320 1180, 540 1120 S 900 1000, 1160 900" stroke="url(#wg)" stroke-width="4" stroke-linecap="round"/>
+  </svg>
+
+  <header class="mkt">
+    <div class="brand">
+      <span class="chip"><img src="../brand-icon.png" alt="Signalo"/></span>
+      <span>Signalo</span>
+    </div>
+    <h1>Patient calls —<br><em>in the card</em></h1>
+    <p>The AI parses the call: topic, type, outcome</p>
+  </header>
+
+  <div class="stage">
+    <div class="ground"></div>
+    <div class="phonewrap">
+      <div class="phone">
+        <div class="punch"></div>
+        <div class="screen">
+          <div class="statusbar"><span>9:41</span><span>5G ▮▮▮ 84%</span></div>
+          <div class="phdr">
+            <span class="back">← BACK</span>
+            <div><div class="nm">Rustem I.</div><div class="sb">Patient card</div></div>
+          </div>
+          <div class="tabs">
+            <div class="tb">Clinic</div>
+            <div class="tb on">Calls</div>
+            <div class="tb">Billing</div>
+          </div>
+          <div class="bd">
+            <div class="sh"><span class="k">PHONE TOUCHPOINTS</span><span class="crm">CRM</span></div>
+
+            <div class="touch open">
+              <div class="r1">
+                <span class="dir in">↙</span>
+                <span class="ct">First inquiry</span>
+              </div>
+              <div class="meta">21 Jun, 10:12 · 4 min 20 sec · Inbound · Regina</div>
+              <div class="badges"><span class="bdg crm">in CRM</span></div>
+              <div class="out">Asked about turnkey implants and the clinic's installment plan. Booked a prosthodontist consultation on 21&nbsp;June, open to ALL-ON-4.</div>
+            </div>
+
+            <div class="touch">
+              <div class="r1">
+                <span class="dir out">↗</span>
+                <span class="ct">Payment / money</span>
+              </div>
+              <div class="meta">18 Jun, 16:40 · 1 min 48 sec · Outbound · Aigul</div>
+              <div class="badges"><span class="bdg crm">in CRM</span></div>
+            </div>
+
+            <div class="touch">
+              <div class="r1">
+                <span class="dir in">↙</span>
+                <span class="ct">Reschedule</span>
+              </div>
+              <div class="meta">14 Jun, 09:05 · 52 sec · Inbound</div>
+              <div class="badges"><span class="bdg proc">processing</span></div>
+            </div>
+
+            <div class="touch">
+              <div class="r1">
+                <span class="dir out">↗</span>
+                <span class="ct">Objection</span>
+              </div>
+              <div class="meta">2 Jun, 11:30 · 3 min 05 sec · Outbound · Aigul</div>
+              <div class="badges"><span class="bdg crm">in CRM</span></div>
+            </div>
+
+            <div class="touch">
+              <div class="r1">
+                <span class="dir in">↙</span>
+                <span class="ct">Feedback</span>
+              </div>
+              <div class="meta">28 May, 14:20 · 2 min 10 sec · Inbound · Regina</div>
+              <div class="badges"><span class="bdg crm">in CRM</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <svg class="conn" style="right:264px;top:720px;width:64px;height:44px" viewBox="0 0 64 44" fill="none">
+      <path d="M62 22 C 34 22, 30 22, 4 22" stroke="#1B9E86" stroke-width="2.6" stroke-dasharray="2 7" stroke-linecap="round"/>
+      <circle cx="60" cy="22" r="5.5" fill="#1B9E86"/>
+    </svg>
+    <div class="flyout">
+      <div class="fk">THE AI PARSED THE CALL</div>
+      <div class="frow">
+        <div class="fi"><span class="kk">TOPIC</span><span class="vv">Turnkey implants</span></div>
+        <div class="fi"><span class="kk">TYPE</span><span class="vv">First inquiry</span></div>
+        <div class="fi"><span class="kk">OUTCOME</span><span class="vv">Booked a consultation</span></div>
+      </div>
+      <div class="famo"><span class="ar">→</span><span class="m">summary pushed to amoCRM</span></div>
+    </div>
+  </div>
+</body>
+</html>
