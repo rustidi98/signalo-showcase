@@ -68,4 +68,4 @@ product on unreliable parts (flaky networks, dying workers, hallucinating models
 and making the whole thing reliable and honest — solo, in production, for real
 users, at a healthcare bar.**
 
-— Rustem Idiatullin · rust.idi98@gmail.com
+— Rustem Idiiatullin · rust.idi98@gmail.com
