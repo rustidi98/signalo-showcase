@@ -11,6 +11,7 @@ the boilerplate.
 | [`stuck-recording-reaper.ts`](./stuck-recording-reaper.ts) | A recording must **never be silently lost.** How an always-on sweeper resolves anything stuck — race-safe across replicas, and immune to the "forever-fresh row" trap. |
 | [`refresh-token-rotation.ts`](./refresh-token-rotation.ts) | **Never log a user out by mistake.** Telling a dropped-response retry apart from a stolen-token replay, using device binding instead of a fragile time window. |
 | [`llm-note-coverage-guard.ts`](./llm-note-coverage-guard.ts) | A medical note must be **honest.** Rejecting an LLM summary that only covers the first few minutes of a long visit — bullet count is not proof of coverage. |
+| [`llm-classifies-code-scores.ts`](./llm-classifies-code-scores.ts) | A score a manager can **trust.** The model only labels each rubric step done/missed/n-a; the weighted score, the traffic-light level, and the escalation are deterministic code — reproducible, auditable, and stable when you swap models. |
 
 Full context for two of these lives in [`../incidents/`](../incidents) — the
 postmortems that made them necessary.

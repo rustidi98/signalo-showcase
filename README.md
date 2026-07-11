@@ -221,6 +221,12 @@ on a network hiccup — and diagnose from the real token records before theorizi
 worthless if the note contains things that weren't said. Guardrails against hallucination aren't a nice-
 to-have here; they're the product.
 
+**A score a manager can trust.** For staff coaching, the model *classifies* each rubric step (done /
+missed / n-a) — the fuzzy judgment it's good at — and deterministic code does the weighted score, the
+traffic-light level, and the escalation. The number is reproducible, auditable, and doesn't silently
+re-scale six months of history when you swap the model. See
+[`sanitized-code/llm-classifies-code-scores.ts`](./sanitized-code/llm-classifies-code-scores.ts).
+
 ## How it's built
 
 Signalo was built by one person at the pace of a small team, because the engineering process itself is
