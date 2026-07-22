@@ -4,7 +4,8 @@ Signalo records a doctor's visit with a patient, transcribes it, and turns it in
 note, coaching feedback for the clinic's coordinators, and analytics for the owner. First market: dental
 clinics. It runs in production, in a real, paying clinic, every day.
 
-I built it end to end, on my own: the product, the mobile apps, the backend, the AI pipeline, and the
+I led it end to end, working solo with AI coding agents: product discovery and workflow design,
+system direction, acceptance criteria, implementation, testing, production validation, and the
 integrations with the clinic's existing software.
 
 **This repo describes the architecture and the engineering. The product's own source stays private** —
@@ -39,8 +40,8 @@ The metrics a senior engineer actually asks about — not line counts.
 | **Note honesty (the whole ballgame)** | A model, left alone, invents clinical detail that was never said. An eval harness **fails the deploy** if grounding regresses: **CRITICAL categories 100% required, HIGH 95%+**, grounding is pass/fail, and coverage is asserted against the *visit duration* — never a bullet count. |
 | **Reliability** | The "false logout" bug — a user booted mid-visit — recurred **8 times** before it was fixed at the principle (only end a session when it's *positively* dead). Now owned by a standing review agent on a presumption of guilt. |
 | **Cost as a feature** | Every LLM call priced and tracked per call; GPUs scale to zero. A mis-tuned setup once burned **~$20/day** — caught and killed because the spend is watched. |
-| **Throughput** | Runs against a real clinic's load — on the order of **hundreds of visits a day** — in daily production, not a demo. |
-| **Built solo** | **~2,700 commits over ~3 months**, one person: five codebases (iOS, Android, web, backend, GPU workers) at small-team pace. |
+| **Production use** | Used daily by **40 clinicians and clinic teams** and has processed **500+ patient visits** in a real clinic, not a demo. |
+| **Delivery model** | One product lead working with AI coding agents across five codebases: iOS, Android, web, backend, and GPU workers. The evidence is in the architecture, evals, incidents, and sanitised code below. |
 
 ---
 
@@ -62,7 +63,7 @@ Nine screens from the production mobile app — localized to English for this sh
 <tr>
 <td width="33%" align="center"><img src="screens/mobile/07-clinic-day.png" width="240"><br><b>The clinic day</b><br><sub>The schedule with attendance statuses and filters — the day at a glance.</sub></td>
 <td width="33%" align="center"><img src="screens/mobile/08-ask-clinic.png" width="240"><br><b>Ask the clinic</b><br><sub>An external AI (Claude, ChatGPT) answers live clinic questions through a read-only connector.</sub></td>
-<td width="33%" align="center"><img src="screens/mobile/09-security.png" width="240"><br><b>Healthcare-grade</b><br><sub>Data residency, on-device encryption, role-based access — and it records only what was said.</sub></td>
+<td width="33%" align="center"><img src="screens/mobile/09-security.png" width="240"><br><b>Designed for clinical workflows</b><br><sub>Role-based access, auditability, privacy controls — and safeguards against unsupported output.</sub></td>
 </tr>
 </table>
 
@@ -99,13 +100,13 @@ in the chart, honest feedback on the call, and numbers the owner can act on.
 
 | | |
 |---|---|
-| **Scope** | iOS app, Android app, web portal, backend, and GPU workers — built from zero in about three months |
-| **Codebase** | Five codebases — TypeScript (backend + web), Swift (iOS), Kotlin (Android), Python (GPU inference). Most of it is machine-written; that's the method. What I defend line-by-line is downstream: the postmortems, the eval gates, the hallucination guardrails. |
+| **Scope** | iOS app, Android app, web portal, backend, and GPU workers — led from discovery into production in about three months |
+| **Codebase** | Five codebases — TypeScript (backend + web), Swift (iOS), Kotlin (Android), Python (GPU inference). AI coding agents are part of the implementation method; I own the requirements, architecture, acceptance criteria, review, testing, and production outcome. |
 | **Speech-to-text** | Self-hosted GigaAM-v3 with speaker separation (WER 3.9% vs 16.4% for Whisper — see *By the numbers*) |
 | **The AI note** | Structured medical notes and coaching from LLMs, with guardrails that can *reject* a note that isn't grounded |
 | **Integrations** | The clinic's practice-management system (schedule + patients), a CRM, and a read-only connector that lets an AI assistant answer live questions about the clinic |
-| **The bar** | Healthcare-grade — patient-data protection, sign/lock/addendum records, audit trails, right-to-be-forgotten |
-| **In production** | Daily use in a real, paying clinic doing **~$5.1M/yr** (shared with the clinic's permission) |
+| **The bar** | Clinical-data controls — role-based access, sign/lock/addendum records, audit trails, and deletion workflows |
+| **In production** | Daily use in a real, paying clinic with approximately **US$5M in annual revenue** (shared with the clinic's permission) |
 
 ---
 
@@ -165,9 +166,9 @@ detail that was never said. Signalo has guardrails so the note reflects what act
 self-heals if a generation step fails instead of silently shipping a broken note.
 
 ### The patient card
-Notes live in a patient card that follows real medical rules: a note is signed, then locked, and after
-that it can only be changed by an addendum — the original is never quietly rewritten. Every access is
-audited. This is the difference between "an app that stores text" and "a medical record."
+Notes live in a patient card with record-integrity controls: a note is signed, then locked, and after
+that it can only be changed by an addendum — the original is never quietly rewritten. Access is
+audited. These controls were designed for the clinic's real documentation workflow, not a demo.
 
 ### Coaching for coordinators
 The same pipeline listens to coordinator-lead calls and produces honest feedback — what was handled
@@ -192,7 +193,7 @@ the source (reframe the capture) instead of cropping and upscaling a low-quality
 ### Platform under all of it
 Auth with refresh tokens (and a hard-won discipline about never logging a user out by mistake — see
 below), feature flags for safe rollout, object storage for audio, error monitoring and health checks,
-push notifications, and a real right-to-be-forgotten implementation — not a promise, actual deletion.
+push notifications, and deletion workflows for patient data.
 
 ---
 
@@ -229,9 +230,8 @@ re-scale six months of history when you swap the model. See
 
 ## How it's built
 
-Signalo was built by one person at the pace of a small team, because the engineering process itself is
-AI-orchestrated: a library of reusable skills, a fleet of specialist review agents, and automated gates
-that block a bad deploy before it ships. That system is documented separately — see the
+I lead Signalo with AI coding agents as part of the engineering process: a library of reusable skills,
+specialist review agents, and automated gates for defined release risks. That system is documented separately — see the
 **[ai-engineering-showcase](../ai-engineering-showcase)** repo. It's the part I'm most convinced is the
 right way to build.
 
@@ -240,9 +240,9 @@ right way to build.
 - Handling two people talking over each other on a phone call — detecting it and getting the transcript right
 - Keeping a medical note honest when the model wants to invent structure
 - Building an eval harness so swapping a model can't silently make the summaries worse
-- Running production for a real, paying clinic, solo: reliability, being on call, and the privacy bar
+- Running production for a real, paying clinic with a solo delivery model: reliability, being on call, and the privacy bar
 
 ---
 
-*Built by Rustem Idiiatullin — founder and hands-on engineer. Building AI products for healthcare;
-relocating to Australia or New Zealand.*
+*Built by Rustem Idiiatullin — founder and applied-AI product builder. Building AI products for healthcare;
+relocating to Auckland, New Zealand.*
