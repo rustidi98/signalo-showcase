@@ -45,6 +45,35 @@ The metrics a senior engineer actually asks about — not line counts.
 
 ---
 
+## Business and workflow impact
+
+Signalo is not only a transcription or clinical-note product. It connects the
+clinic's conversation data, practice-management system, CRM and reporting so the
+same information can support patient follow-up, clinical documentation and
+management decisions.
+
+- Reduced clinical-record completion from approximately **15 minutes to 2 minutes per visit**.
+- Digitised the clinic's clinical database and identified more than **US$10M in
+  estimated remaining treatment potential** by analysing each patient's dental
+  chart, current clinical data and completed treatment. This is an estimate, not
+  recognised revenue; the clinic is now using the patient-level view to
+  prioritise follow-up and work systematically with opportunities that were
+  previously fragmented across systems.
+- Connected consultation recordings, coordinator calls, the clinic's
+  practice-management system and amoCRM around the same patient journey.
+- Automated daily late-arrival reporting from **40-70 minutes to approximately
+  1 minute** and removed approximately **3 hours of manual revenue reporting per
+  week**.
+- Put the product into daily use inside a clinic with **100+ staff** and
+  approximately **US$5M in annual revenue**.
+
+The point of these numbers is not that software "created" the whole opportunity.
+The value was already present in the patient base. The product made it visible,
+traceable and actionable without asking leadership to reconcile fragmented
+systems by hand.
+
+---
+
 ## The product, in screens
 
 Nine screens from the production mobile app — localized to English for this showcase (the product ships in Russian for its market). Demo data throughout; no real patient information.
