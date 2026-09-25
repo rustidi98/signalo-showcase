@@ -1,0 +1,1279 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Signalo — «Материалы» в мобильном приложении (черновой макет SIG-835)</title>
+  <!--
+    ЧЕРНОВОЙ МАКЕТ ДЛЯ ПОКАЗА CEO. Не согласован. Сотрудники, кабинеты, номера заявок
+    и выдач синтетические, пациентов в макете нет.
+
+    Это НЕ веб-кабинет на узком экране. Каркас и визуальный язык взяты из нативных
+    приложений Signalo и уже согласованного мобильного макета «Мои задачи» v7
+    (docs/01-product/assets/mockups/my-tasks-mobile-mockup-v7.html):
+
+      токены     — apps/ios-mobile/Signalo/DesignSystem/Theme/Colors.swift, Typography.swift;
+                   Android — designsystem/theme/Color.kt (1:1 hex c iOS), Type.kt, Dimens.kt, Theme.kt
+      экран      — SignaloScreenContainer (фон signaloBg, отступ 24pt), CrmMyTasksView
+                   (эйебрау jbMono 9.5 → заголовок Manrope 26 semibold → строка-плашка → группы)
+      сегменты   — ClinicFilterSegment (подложка Bg, активный TealDeep, тап ≥44)
+      карточки   — CrmTaskCardView (Card, обводка Line, r14, padding 13)
+      листы      — CrmNewTaskSheet / CrmTaskSheetKit (фон Paper, CrmSheetHeader, CrmSectionLabel,
+                   CrmQuickDueRow 48, CrmDateFieldButton 48, CrmPrimaryButton TealDeep r12)
+      вход       — MoreHubView.menuRow (иконка TealDeep в колонке 28, 15 medium, подпись 11 Ink3)
+      прогресс   — SignaloStepPills (капсулы 22×5, Teal / TealDeep / Line)
+      Android    — MainTabScreen (M3 NavigationBar на Bg, без пилюли-индикатора, HorizontalDivider
+                   Line), CrmTasksScreen (ExtendedFloatingActionButton TealDeep), ModalBottomSheet
+                   на Bg, SignaloBackButton «← НАЗАД» (jbMono, 48dp).
+
+    Отступление от существующих компонентов (осознанно): CrmChoiceChip (40), кнопка «Отмена»
+    в CrmSheetHeader (34) и headerIcon (40) подняты до 44pt / 48dp — требование задачи.
+  -->
+  <style>
+    @font-face { font-family: Manrope; src: url("fonts/Manrope.ttf") format("truetype"); font-weight: 200 800; font-display: block; }
+    @font-face { font-family: JBMono; src: url("fonts/JetBrainsMono-Medium.ttf") format("truetype"); font-weight: 500; font-display: block; }
+    @font-face { font-family: JBMono; src: url("fonts/JetBrainsMono-SemiBold.ttf") format("truetype"); font-weight: 600 800; font-display: block; }
+    @font-face { font-family: JBMono; src: url("fonts/JetBrainsMono-Regular.ttf") format("truetype"); font-weight: 100 400; font-display: block; }
+
+    :root {
+      /* Colors.swift / Color.kt */
+      --bg: #eef4fb; --paper: #f7faff; --card: #ffffff;
+      --ink: #0c1b38; --ink2: #2a3a5c; --ink3: #56688a; --ink4: #6b7f9c;
+      --line: rgba(12, 27, 56, .10); --line2: rgba(12, 27, 56, .06);
+      --teal: #28c4a4; --teal-deep: #1b9e86; --teal-soft: rgba(40, 196, 164, .14); --teal-soft-bg: #d8f5ef; --teal-ink: #0f4c42;
+      --navy: #1648a0; --navy-deep: #0c2d72; --navy-soft: #e8eff9;
+      --amber: #d49d2b; --amber-deep: #b47620; --amber-soft: rgba(240, 197, 62, .18); --amber-ink: #7a3c20;
+      --rec: #d64c3d; --rec-soft: rgba(214, 76, 61, .14); --rec-ink: #b21f3a;
+      --confirm: #3f9d6a; --confirm-soft: #e9f4ee; --confirm-line: #bfe0cd; --confirm-ink: #2a6b48;
+
+      --pad: 24px;             /* SignaloScreenContainer.horizontalPadding */
+      --tap: 44px;             /* iOS HIG; на Android — 48dp */
+      --ease: cubic-bezier(.4, 0, .2, 1);
+      --ease-soft: cubic-bezier(.16, 1, .3, 1);
+      --mono: JBMono, ui-monospace, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: Manrope, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+    button, input { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 3px solid var(--teal-deep); outline-offset: 2px; border-radius: 8px; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+
+    .sf { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+    .sf--sm { width: 13px; height: 13px; stroke-width: 2; }
+    .sf--tab { width: 22px; height: 22px; stroke-width: 1.6; }
+    .sf--fill { fill: currentColor; stroke: none; }
+
+    /* ── стенд ───────────────────────────────────────────────────────────────── */
+    .stage { width: min(1260px, calc(100% - 40px)); margin: 0 auto; padding: 28px 0 56px; }
+    .stage__eyebrow { margin: 0 0 8px; color: var(--ink3); font: 600 10px/1.4 var(--mono); letter-spacing: 1px; text-transform: uppercase; }
+    .stage h1 { margin: 0 0 10px; max-width: 760px; font-size: 28px; font-weight: 700; line-height: 1.15; letter-spacing: -.03em; }
+    .flags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .flag { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+    .flag--mock { background: var(--amber-soft); color: var(--amber-ink); border: 1px solid rgba(212, 157, 43, .4); }
+    .flag--scope { background: var(--teal-soft-bg); color: var(--teal-ink); }
+    .controls { display: grid; gap: 10px; margin-bottom: 22px; }
+    .ctlrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .ctlrow > span { width: 92px; font: 600 10px/1.3 var(--mono); letter-spacing: .8px; text-transform: uppercase; color: var(--ink3); }
+    .sw { min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--card); color: var(--ink2); font-size: 12.5px; font-weight: 600; }
+    .sw[aria-pressed="true"] { background: var(--teal-deep); border-color: var(--teal-deep); color: #fff; }
+    .layout { display: grid; grid-template-columns: auto minmax(300px, 1fr); gap: 44px; align-items: start; }
+    .notes { font-size: 13px; line-height: 1.55; color: var(--ink2); }
+    .notes h3 { margin: 0 0 8px; font: 600 10.5px/1.3 var(--mono); letter-spacing: .9px; text-transform: uppercase; color: var(--ink3); }
+    .notes section { padding: 16px 18px; margin-bottom: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+    .notes p { margin: 0 0 8px; } .notes ul { margin: 0; padding-left: 18px; } .notes li { margin: 0 0 5px; }
+    .notes code { font: 500 11.5px var(--mono); background: var(--bg); padding: 1px 5px; border-radius: 5px; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
+
+    /* ── устройство ──────────────────────────────────────────────────────────── */
+    .phone { position: relative; width: 393px; height: 852px; display: flex; flex-direction: column; overflow: hidden;
+             background: var(--bg); border: 11px solid #101828; border-radius: 52px; box-shadow: 0 30px 70px rgba(12, 27, 56, .22); }
+    .phone[data-p="android"] { --tap: 48px; width: 412px; height: 915px; border-width: 8px; border-radius: 40px; }
+
+    .ios-only, .and-only { display: none !important; }
+    .phone[data-p="ios"] .ios-only { display: revert !important; }
+    .phone[data-p="android"] .and-only { display: revert !important; }
+    .phone[data-p="ios"] .ios-only.flexy, .phone[data-p="android"] .and-only.flexy { display: flex !important; }
+
+    .statusbar { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 13px 28px 4px; font-size: 14px; font-weight: 700; letter-spacing: -.01em; }
+    .statusbar__right { display: inline-flex; align-items: center; gap: 5px; }
+    .bars { display: inline-flex; align-items: flex-end; gap: 2px; }
+    .bars span { display: block; width: 3px; border-radius: 1px; background: var(--ink); }
+    .bars span:nth-child(1) { height: 5px; } .bars span:nth-child(2) { height: 7px; } .bars span:nth-child(3) { height: 9px; } .bars span:nth-child(4) { height: 11px; }
+    .batt { width: 22px; height: 11px; border: 1.3px solid var(--ink); border-radius: 3px; position: relative; }
+    .batt::after { content: ""; position: absolute; inset: 1.6px; right: 5px; border-radius: 1px; background: var(--ink); }
+    /* Android-статусбар: системный шрифт, камера-«дырка» по центру */
+    .sb-and { flex: none; position: relative; display: flex; align-items: center; justify-content: space-between; height: 32px; padding: 4px 22px 0; font: 500 13.5px/1 Roboto, "Segoe UI", system-ui, sans-serif; color: var(--ink); }
+    .sb-and::after { content: ""; position: absolute; left: 50%; top: 9px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: #101828; }
+    .sb-and__icons { display: inline-flex; gap: 6px; align-items: center; }
+    .sb-and__icons i { display: block; width: 14px; height: 11px; background: var(--ink); clip-path: polygon(0 100%, 100% 0, 100% 100%); }
+    .sb-and__icons b { display: block; width: 9px; height: 14px; border-radius: 2px; background: var(--ink); }
+
+    .screen { display: none; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 0 24px; }
+    .screen::-webkit-scrollbar { width: 0; }
+    .screen.is-on { display: block; }
+    .phone[data-fab="1"] .screen.is-on { padding-bottom: 96px; }
+    .pad { padding-left: var(--pad); padding-right: var(--pad); }
+
+    /* назад: iOS — «крошка»-чип MoreHubView.embedded; Android — SignaloBackButton */
+    .navrow { position: sticky; top: 0; z-index: 2; padding: 6px 16px 6px; background: var(--bg); }
+    .navchip { display: inline-flex; align-items: center; gap: 5px; min-height: var(--tap); padding: 0 14px 0 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--ink2); font-size: 14px; font-weight: 500; letter-spacing: -.1px; }
+    .backand { display: inline-flex; align-items: center; gap: 6px; min-height: 48px; padding: 0 6px; border: 0; background: transparent; color: var(--ink3); font: 600 10px/1 var(--mono); letter-spacing: .8px; }
+    .backand b { font-size: 12px; }
+
+    /* шапка экрана — CrmMyTasksView.eyebrow/titleRow */
+    .eyebrow { margin: 6px 0 6px; color: var(--ink3); font: 600 9.5px/1.3 var(--mono); letter-spacing: .7px; text-transform: uppercase; }
+    .titlerow { display: flex; align-items: center; gap: 10px; }
+    .titlerow h2 { flex: 1; margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -.5px; line-height: 1.15; }
+    .hicon { position: relative; width: var(--tap); height: var(--tap); display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: var(--card); color: var(--ink2); }
+    .hicon .dot { position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--teal-deep); }
+    .lede { margin: 6px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink3); }
+
+    /* плашка-строка — CrmMyTasksView.syncLine (TealSoft, r11) */
+    .bar { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 8px 11px; border-radius: 11px; font-size: 11.5px; font-weight: 500; line-height: 1.35; }
+    .bar--teal { background: var(--teal-soft); color: var(--ink2); }
+    .bar--teal .sf { color: var(--teal-deep); }
+    .bar b { font-weight: 700; color: var(--ink); }
+
+    /* подпись секции — CrmSectionLabel / ClinicFilterGroup */
+    .label { display: flex; align-items: center; gap: 6px; margin: 20px 0 9px; font: 600 9.5px/1.2 var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--ink3); }
+    .label b { font-weight: 700; color: var(--ink4); }
+    .label .more-link { margin-left: auto; display: inline-flex; align-items: center; gap: 3px; min-height: var(--tap); margin-block: calc((var(--tap) - 12px) / -2); padding: 0 2px; border: 0; background: transparent; font: 600 12px/1 Manrope, sans-serif; letter-spacing: 0; text-transform: none; color: var(--teal-ink); }
+
+    /* чипы-капсулы (CrmChoiceChip, поднят до --tap) */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chips--scroll { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 calc(var(--pad) * -1); padding: 0 var(--pad); }
+    .chips--scroll::-webkit-scrollbar { display: none; }
+    .chip { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: var(--tap); padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--ink2); font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+    .chip small { font-size: 11px; font-weight: 500; color: var(--ink3); }
+    .chip b { font: 600 11.5px/1 var(--mono); opacity: .75; }
+    .chip[aria-pressed="true"] { background: var(--teal-deep); border-color: transparent; color: #fff; }
+    .chip[aria-pressed="true"] small { color: rgba(255, 255, 255, .82); }
+
+    /* сегмент — ClinicFilterSegment */
+    .seg { display: flex; padding: 3px; border-radius: 11px; background: var(--card); border: 1px solid var(--line); }
+    .seg button { flex: 1; min-height: var(--tap); display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 8px; background: transparent; color: var(--ink2); font-size: 12.5px; font-weight: 600; }
+    .seg button b { font: 600 11px/1 var(--mono); opacity: .7; }
+    .seg button[aria-pressed="true"] { background: var(--teal-deep); color: #fff; }
+
+    /* карточка-обёртка списка — MoreHubView.menucard / CrmTaskCardView */
+    .card { border: 1px solid var(--line); border-radius: 14px; background: var(--card); overflow: hidden; }
+    .row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 60px; padding: 12px 14px; border: 0; background: transparent; text-align: left; }
+    .row + .row { border-top: 1px solid var(--line2); }
+    .row > .sf:first-child { width: 28px; color: var(--teal-deep); }
+    .row__txt { flex: 1; min-width: 0; }
+    .row__txt b { display: block; font-size: 15px; font-weight: 500; letter-spacing: -.1px; }
+    .row__txt span { display: block; margin-top: 2px; font-size: 11px; color: var(--ink3); }
+    .row__chev { color: var(--ink4); }
+    .row__count { font: 600 12px/1 var(--mono); color: var(--ink3); }
+    .redbadge { flex: none; min-width: 20px; height: 20px; padding: 0 5px; display: grid; place-items: center; border-radius: 999px; background: var(--rec); color: #fff; font-size: 11px; font-weight: 700; }
+
+    /* статус-пилюли — готовые пары из Colors.swift */
+    .pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 999px; font: 600 9.5px/1.2 var(--mono); letter-spacing: .35px; text-transform: uppercase; white-space: nowrap; }
+    .pill--confirm { background: var(--confirm-soft); color: var(--confirm-ink); }
+    .pill--navy { background: var(--navy-soft); color: var(--navy); }
+    .pill--amber { background: var(--amber-soft); color: var(--amber-ink); }
+    .pill--rec { background: var(--rec-soft); color: var(--rec-ink); }
+    .pill--plain { background: var(--bg); color: var(--ink2); }
+
+    /* ── ОБЗОР ───────────────────────────────────────────────────────────────── */
+    /* «Готово к получению» — единственный акцентный блок экрана */
+    .ready { margin-top: 14px; padding: 14px; border-radius: 16px; background: var(--card); border: 1px solid rgba(27, 158, 134, .35); box-shadow: 0 6px 18px rgba(27, 158, 134, .10); }
+    .ready__top { display: flex; gap: 12px; align-items: flex-start; }
+    .ready__ic { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: var(--teal-soft-bg); color: var(--teal-ink); }
+    .ready__txt { flex: 1; min-width: 0; }
+    .ready__eyebrow { font: 600 9.5px/1.2 var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--teal-ink); }
+    .ready__title { margin: 4px 0 0; font-size: 16px; font-weight: 600; letter-spacing: -.2px; }
+    .ready__sub { margin: 3px 0 0; font-size: 12px; color: var(--ink3); line-height: 1.4; }
+    .ready__items { display: flex; flex-wrap: wrap; gap: 6px; margin: 11px 0 0; padding: 0; list-style: none; }
+    .ready__items li { padding: 5px 9px; border-radius: 999px; background: var(--bg); font-size: 11.5px; font-weight: 500; color: var(--ink2); }
+    .ready__acts { display: flex; gap: 8px; margin-top: 12px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: var(--tap); padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink2); font-size: 13.5px; font-weight: 600; }
+    .btn--primary { border-color: transparent; background: var(--teal-deep); color: #fff; }
+    .btn--grow { flex: 1; }
+
+    .wait { display: flex; align-items: center; gap: 11px; width: 100%; margin-top: 10px; min-height: 56px; padding: 10px 14px; border: 1px solid rgba(212, 157, 43, .35); border-radius: 14px; background: var(--amber-soft); text-align: left; color: var(--amber-ink); }
+    .wait__txt { flex: 1; min-width: 0; }
+    .wait__txt b { display: block; font-size: 13.5px; font-weight: 600; }
+    .wait__txt span { display: block; margin-top: 2px; font-size: 11.5px; color: var(--amber-ink); opacity: .9; }
+
+    .urgent { display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 8px; min-height: var(--tap); padding: 8px 12px; border: 1px dashed rgba(178, 31, 58, .35); border-radius: 12px; background: transparent; text-align: left; }
+    .urgent .sf { color: var(--rec-ink); }
+    .urgent__txt { flex: 1; font-size: 12px; color: var(--ink3); line-height: 1.35; }
+    .urgent__txt b { display: block; font-size: 13px; font-weight: 600; color: var(--rec-ink); }
+
+    /* «Ожидается»: список строк, не карточки — другой ритм, чем «Готово» */
+    .exp { display: grid; grid-template-columns: 1fr auto; gap: 3px 10px; padding: 12px 14px; }
+    .exp + .exp { border-top: 1px solid var(--line2); }
+    .exp__name { font-size: 13.5px; font-weight: 600; letter-spacing: -.1px; }
+    .exp__qty { font: 600 12px/1.4 var(--mono); color: var(--ink2); text-align: right; }
+    .exp__st { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 11.5px; color: var(--ink3); }
+    .exp__st i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--c, var(--ink4)); }
+    .exp__st b { font-weight: 600; color: var(--ct, var(--ink2)); }
+    .exp__st s { color: var(--ink4); }
+    .foot-note { margin: 8px 2px 0; font-size: 11px; line-height: 1.45; color: var(--ink3); }
+
+    .reqline { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 60px; padding: 11px 14px; border: 0; background: transparent; text-align: left; }
+    .reqline + .reqline { border-top: 1px solid var(--line2); }
+    .reqline__id { flex: none; width: 50px; font: 600 12px/1.2 var(--mono); color: var(--ink2); }
+    .reqline__txt { flex: 1; min-width: 0; }
+    .reqline__txt b { display: block; font-size: 13.5px; font-weight: 600; letter-spacing: -.1px; }
+    .reqline__txt span { display: block; margin-top: 2px; font-size: 11px; color: var(--ink3); }
+
+    /* ── FAB ─────────────────────────────────────────────────────────────────── */
+    .fab { position: absolute; right: 18px; z-index: 3; display: none; align-items: center; gap: 7px; border: 0; color: #fff; font-weight: 600; }
+    .phone[data-fab="1"] .fab { display: inline-flex; }
+    /* iOS — CrmMyTasksView.floatingNewTaskButton: капсула, градиент, 48 */
+    .phone[data-p="ios"] .fab { bottom: 104px; min-height: 48px; padding: 0 17px 0 15px; border-radius: 999px; font-size: 13.5px; background: linear-gradient(180deg, var(--teal), var(--teal-deep)); box-shadow: 0 4px 10px rgba(12, 27, 56, .18); }
+    /* Android — ExtendedFloatingActionButton(containerColor = TealDeep), M3 r16, 56dp */
+    .phone[data-p="android"] .fab { bottom: 112px; min-height: 56px; padding: 0 20px 0 16px; border-radius: 16px; font-size: 14px; background: var(--teal-deep); box-shadow: 0 3px 6px rgba(12, 27, 56, .2), 0 1px 2px rgba(12, 27, 56, .18); }
+
+    /* ── нижняя панель действия ──────────────────────────────────────────────── */
+    .bbar { display: none; flex: none; padding: 12px 16px 12px; background: var(--bg); border-top: 1px solid var(--line); }
+    .bbar.is-on { display: block; }
+    .phone[data-tabbar="0"] .bbar { padding-bottom: 30px; }
+    .phone[data-p="android"][data-tabbar="0"] .bbar { padding-bottom: 26px; }
+    .cta { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 52px; border: 0; border-radius: 14px; color: #fff; font-size: 16px; font-weight: 600; background: linear-gradient(135deg, var(--teal), var(--teal-deep)); box-shadow: 0 8px 10px rgba(40, 196, 164, .25); }
+    .phone[data-p="android"] .cta { background: var(--teal-deep); box-shadow: none; }
+    .cta--ink { background: var(--ink) !important; box-shadow: none; }
+    .cta--rec { background: var(--rec-ink) !important; box-shadow: none; }
+    .cta--ghost { margin-top: 8px; width: 100%; min-height: var(--tap); border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink2); font-size: 13px; font-weight: 600; }
+    .ctanote { margin: 8px 0 0; text-align: center; font-size: 11.5px; color: var(--ink3); line-height: 1.4; }
+
+    /* ── таб-бар ─────────────────────────────────────────────────────────────── */
+    .tabbar { flex: none; display: flex; padding: 10px 0 24px; background: rgba(247, 250, 255, .94); border-top: 1px solid var(--line); }
+    .tabbar button { flex: 1; position: relative; display: grid; justify-items: center; gap: 4px; min-height: 48px; border: 0; background: transparent; color: var(--ink3); font-size: 11px; font-weight: 600; letter-spacing: -.05px; }
+    .tabbar button[aria-current="page"] { color: var(--teal-deep); }
+    .tabbar button[aria-current="page"] .sf--tab { stroke-width: 2.1; }
+    .tab-badge { position: absolute; top: -5px; left: 50%; transform: translateX(8px); min-width: 18px; height: 18px; padding: 0 4px; display: grid; place-items: center; border-radius: 999px; background: var(--rec); color: #fff; font: 600 10px/1 var(--mono); box-shadow: 0 0 0 2px var(--bg); }
+    /* Android — M3 NavigationBar(containerColor = Bg), без пилюли, подпись fs2 = 12sp */
+    .phone[data-p="android"] .tabbar { padding: 12px 0 30px; background: var(--bg); }
+    .phone[data-p="android"] .tabbar button { font-size: 12px; font-weight: 400; gap: 6px; min-height: 56px; }
+    .phone[data-p="android"] .tabbar button[aria-current="page"] { font-weight: 600; }
+    .phone[data-tabbar="0"] .tabbar { display: none; }
+    .homebar { position: absolute; left: 50%; bottom: 8px; z-index: 9; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: var(--ink); opacity: .85; pointer-events: none; }
+    .phone[data-p="android"] .homebar { width: 108px; height: 4px; margin-left: -54px; bottom: 9px; opacity: .55; }
+
+    /* ── листы ───────────────────────────────────────────────────────────────── */
+    .scrim { position: absolute; inset: 0; z-index: 6; background: rgba(9, 22, 46, .34); display: none; }
+    .phone[data-sheet="1"] .scrim { display: block; }
+    .sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 7; display: none; flex-direction: column; max-height: 92%; background: var(--paper); border-radius: 14px 14px 0 0; box-shadow: 0 -14px 40px rgba(12, 27, 56, .2); }
+    .phone[data-sheet="1"] .sheet { display: flex; }
+    .phone[data-p="android"] .sheet { background: var(--bg); border-radius: 28px 28px 0 0; }
+    .grab { width: 36px; height: 5px; margin: 7px auto 0; border-radius: 999px; background: rgba(12, 27, 56, .18); flex: none; }
+    .phone[data-p="android"] .grab { width: 32px; height: 4px; margin-top: 16px; background: rgba(86, 104, 138, .4); }
+    .sheet__body { overflow-y: auto; padding: 14px 20px 8px; }
+    .sheet__body::-webkit-scrollbar { width: 0; }
+    .sh-head { display: flex; align-items: flex-start; gap: 12px; }
+    .sh-head__txt { flex: 1; min-width: 0; }
+    .sh-head .eyebrow { margin: 0; }
+    .sh-head h3 { margin: 6px 0 0; font-size: 19px; font-weight: 600; letter-spacing: -.3px; }
+    .sh-head p { margin: 6px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink3); }
+    .sh-head p b { color: var(--ink); font-weight: 600; }
+    .sh-close { flex: none; min-height: var(--tap); padding: 0 14px; border: 0; border-radius: 999px; background: var(--bg); color: var(--ink3); font-size: 13px; font-weight: 600; }
+    .phone[data-p="android"] .sh-close { background: var(--card); border: 1px solid var(--line); }
+    .sheet .label { margin-top: 18px; }
+    .sheet__cta { flex: none; padding: 12px 20px 26px; border-top: 1px solid var(--line); background: inherit; }
+    .sheet__cta .cta { background: var(--teal-deep); box-shadow: none; height: 50px; border-radius: 12px; font-size: 15px; } /* CrmPrimaryButton */
+
+    .phone[data-mode="urgent"] .m-plan { display: none !important; }
+    .phone:not([data-mode="urgent"]) .m-urgent { display: none !important; }
+
+    /* поиск — поле как PatientsListView */
+    .search { display: flex; align-items: center; gap: 9px; min-height: 48px; padding: 0 12px; border: 1px solid var(--teal-deep); border-radius: 12px; background: var(--card); box-shadow: 0 0 0 3px rgba(40, 196, 164, .14); }
+    .search .sf { color: var(--ink4); }
+    .search input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-size: 14px; font-weight: 500; }
+    .search__clear { width: var(--tap); height: var(--tap); margin-right: -10px; display: grid; place-items: center; border: 0; background: transparent; color: var(--ink4); }
+    .results { margin-top: 8px; }
+    .res { display: flex; align-items: center; gap: 10px; padding: 11px 12px; }
+    .res + .res { border-top: 1px solid var(--line2); }
+    .res__txt { flex: 1; min-width: 0; }
+    .res__txt b { display: block; font-size: 14px; font-weight: 600; letter-spacing: -.1px; }
+    .res__txt span { display: block; margin-top: 2px; font-size: 11.5px; color: var(--ink3); }
+    .res__syn { display: inline-flex !important; margin-top: 6px !important; padding: 3px 8px; border-radius: 999px; background: var(--navy-soft); color: var(--navy) !important; font-size: 11px !important; font-weight: 600; }
+    .res__add { flex: none; width: var(--tap); height: var(--tap); display: grid; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); color: var(--teal-deep); }
+    .res__add[aria-pressed="true"] { background: var(--teal-deep); color: #fff; border-color: transparent; }
+    .propose { display: flex; align-items: center; gap: 8px; width: 100%; min-height: var(--tap); margin-top: 6px; padding: 0 4px; border: 0; background: transparent; color: var(--teal-ink); font-size: 12.5px; font-weight: 600; text-align: left; }
+
+    /* строка заявки в листе */
+    .line { padding: 12px; }
+    .line + .line { border-top: 1px solid var(--line2); }
+    .line__top { display: flex; align-items: center; gap: 10px; }
+    .line__txt { flex: 1; min-width: 0; }
+    .line__txt b { display: block; font-size: 14px; font-weight: 600; letter-spacing: -.1px; }
+    .line__txt span { display: block; margin-top: 2px; font-size: 11.5px; color: var(--ink3); }
+    .stepper { flex: none; display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+    .stepper button { width: var(--tap); height: var(--tap); display: grid; place-items: center; border: 0; background: transparent; color: var(--ink2); }
+    .stepper output { min-width: 40px; text-align: center; font: 600 13px/1 var(--mono); }
+    .stepper output small { display: block; margin-top: 2px; font: 500 9.5px/1 Manrope, sans-serif; color: var(--ink3); }
+    .dup { margin-top: 10px; padding: 10px 11px; border-radius: 11px; background: var(--amber-soft); }
+    .dup p { margin: 0; font-size: 12px; line-height: 1.4; color: var(--amber-ink); }
+    .dup p b { font-weight: 700; }
+    .dup__acts { display: flex; gap: 8px; margin-top: 9px; }
+    .dup__acts .btn { min-height: var(--tap); padding: 0 12px; font-size: 12.5px; border-radius: 10px; background: var(--card); }
+
+    .due { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 0 13px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); text-align: left; }
+    .due + .due { margin-top: 8px; }
+    .due[aria-pressed="true"] { background: var(--teal-soft); border-color: var(--teal-deep); }
+    .due__radio { width: 18px; height: 18px; border-radius: 50%; border: 1.6px solid var(--ink4); flex: none; }
+    .due[aria-pressed="true"] .due__radio { border: 5px solid var(--teal-deep); }
+    .due__t { flex: 1; font-size: 14px; font-weight: 600; }
+    .due__t small { display: block; font-size: 11.5px; font-weight: 500; color: var(--ink3); margin-top: 1px; }
+    .due__h { font: 500 11px/1 var(--mono); color: var(--ink3); }
+    .note-plain { margin: 8px 2px 0; font-size: 11.5px; line-height: 1.45; color: var(--ink3); }
+    .urgentnote { display: flex; gap: 10px; margin-top: 14px; padding: 12px; border-radius: 14px; background: var(--rec-soft); border: 1px solid rgba(214, 76, 61, .3); }
+    .urgentnote__ic { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: var(--rec); color: #fff; }
+    .urgentnote p { margin: 0; font-size: 12px; line-height: 1.45; color: var(--rec-ink); }
+    .urgentnote p b { display: block; font-size: 13.5px; margin-bottom: 2px; }
+    .ta { width: 100%; min-height: 72px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); font-size: 13.5px; color: var(--ink4); }
+
+    /* ── ЗАЯВКИ ──────────────────────────────────────────────────────────────── */
+    .rq { margin-top: 10px; padding: 13px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+    .rq[data-tone="urgent"] { border-color: rgba(178, 31, 58, .28); }
+    .rq__top { display: flex; align-items: flex-start; gap: 8px; }
+    .rq__id { font: 600 11px/1.3 var(--mono); color: var(--ink3); }
+    .rq__title { margin: 2px 0 0; font-size: 14.5px; font-weight: 600; letter-spacing: -.1px; }
+    .rq__top > div { flex: 1; min-width: 0; }
+    .rq__meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+    .mchip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 999px; background: var(--bg); font-size: 11.5px; font-weight: 500; color: var(--ink3); }
+    .mchip .sf { width: 11px; height: 11px; color: var(--ink4); }
+    .prog { display: flex; gap: 3px; margin-top: 11px; }
+    .prog i { flex: 1; height: 5px; border-radius: 3px; background: var(--line); }
+    .prog i[data-s="done"] { background: var(--confirm); }
+    .prog i[data-s="way"] { background: var(--navy); opacity: .55; }
+    .prog__cap { margin-top: 6px; font-size: 11px; color: var(--ink3); }
+    .rq__foot { display: flex; align-items: center; gap: 8px; margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--line2); }
+    .who { flex: 1; min-width: 0; display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 500; color: var(--ink3); }
+    .who i { flex: none; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; font: 700 10px/1 Manrope, sans-serif; font-style: normal; color: var(--ink3); background: var(--bg); }
+    .who--me i { color: #fff; background: linear-gradient(180deg, var(--teal), var(--teal-deep)); }
+    .rq__foot .btn { min-height: var(--tap); padding: 0 12px; font-size: 12.5px; border-radius: 10px; background: var(--bg); }
+    .rq__foot .btn--primary { background: var(--teal-deep); }
+
+    /* ── ЗАЯВКА ──────────────────────────────────────────────────────────────── */
+    .dhead h2 { margin: 2px 0 0; font-size: 24px; font-weight: 600; letter-spacing: -.5px; }
+    .dhead__meta { margin: 6px 0 0; font-size: 12px; color: var(--ink3); line-height: 1.45; }
+    .dhead__pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .dhead .pill--plain { background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
+    .pos { padding: 12px 14px; }
+    .pos + .pos { border-top: 1px solid var(--line2); }
+    .pos__top { display: flex; align-items: baseline; gap: 10px; }
+    .pos__name { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 600; letter-spacing: -.1px; }
+    .pos__q { font: 600 12px/1.3 var(--mono); color: var(--ink2); white-space: nowrap; }
+    .pos__sub { margin-top: 3px; font-size: 11.5px; color: var(--ink3); }
+    .pos__st { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .vtl { position: relative; margin: 0; padding: 2px 0 0 0; list-style: none; }
+    .vtl li { position: relative; padding: 0 0 16px 26px; }
+    .vtl li::before { content: ""; position: absolute; left: 6px; top: 16px; bottom: 0; width: 1.5px; background: var(--line); }
+    .vtl li:last-child::before { display: none; }
+    .vtl li > i { position: absolute; left: 0; top: 3px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--ink4); background: var(--bg); }
+    .vtl li[data-now] > i { border-color: var(--teal-deep); background: var(--teal-deep); box-shadow: 0 0 0 3px rgba(40, 196, 164, .2); }
+    .vtl__h { display: flex; gap: 8px; align-items: baseline; font-size: 13px; font-weight: 600; }
+    .vtl__h span { font: 500 10.5px/1 var(--mono); color: var(--ink3); }
+    .vtl__who { margin-top: 2px; font-size: 11.5px; color: var(--ink3); }
+    .vtl__what { margin-top: 6px; padding: 8px 10px; border-radius: 10px; background: var(--card); border: 1px solid var(--line2); font-size: 12px; line-height: 1.45; color: var(--ink2); }
+    .vtl__what s { color: var(--ink4); }
+
+    /* ── ПОЛУЧЕНИЕ (полноэкранный поток, без таб-бара) ──────────────────────── */
+    .flowhead { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 10px; padding: 8px 16px 8px 24px; background: var(--bg); }
+    .pills { display: inline-flex; gap: 6px; }
+    .pills i { width: 22px; height: 5px; border-radius: 999px; background: var(--line); }
+    .pills i[data-s="done"] { background: var(--teal); }
+    .pills i[data-s="cur"] { background: var(--teal-deep); }
+    .flowhead__step { flex: 1; font: 600 9.5px/1 var(--mono); letter-spacing: .6px; text-transform: uppercase; color: var(--ink3); }
+    .flowhead .sh-close { background: var(--card); border: 1px solid var(--line); }
+    .rcp { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); text-align: left; }
+    .rcp + .rcp { margin-top: 8px; }
+    .rcp[aria-pressed="true"] { background: var(--teal-soft); border-color: var(--teal-deep); }
+    .rcp .due__radio { }
+    .rcp[aria-pressed="true"] .due__radio { border: 5px solid var(--teal-deep); }
+    .rcp__t { flex: 1; min-width: 0; }
+    .rcp__t b { display: block; font-size: 14px; font-weight: 600; }
+    .rcp__t span { display: block; margin-top: 1px; font-size: 11.5px; color: var(--ink3); }
+    .take { padding: 12px 12px 12px 6px; }
+    .take + .take { border-top: 1px solid var(--line2); }
+    .take__top { display: flex; align-items: center; gap: 4px; }
+    .check { flex: none; width: var(--tap); height: var(--tap); display: grid; place-items: center; border: 0; background: transparent; }
+    .check i { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 7px; border: 1.6px solid var(--ink4); color: #fff; }
+    .check[aria-pressed="true"] i { background: var(--teal-deep); border-color: var(--teal-deep); }
+    .take__txt { flex: 1; min-width: 0; }
+    .take__txt b { display: block; font-size: 13.5px; font-weight: 600; letter-spacing: -.1px; }
+    .take__txt span { display: block; margin-top: 2px; font-size: 11.5px; color: var(--ink3); }
+    .tag { display: inline-block; margin-left: 4px; font-style: normal; padding: 1px 6px; border-radius: 999px; background: var(--navy-soft); color: var(--navy); font-size: 10px; font-weight: 700; vertical-align: 1px; }
+    .take__warn { margin: 8px 0 0 48px; padding: 7px 9px; border-radius: 9px; background: var(--amber-soft); font-size: 11.5px; line-height: 1.4; color: var(--amber-ink); }
+    .addmat { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 48px; margin-top: 10px; border: 1.5px dashed rgba(12, 27, 56, .2); border-radius: 12px; background: transparent; color: var(--teal-ink); font-size: 13px; font-weight: 600; }
+
+    .doc { margin-top: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); overflow: hidden; }
+    .doc__head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--paper); border-bottom: 1px solid var(--line2); }
+    .doc__head > div { flex: 1; min-width: 0; }
+    .doc__head b { display: block; font-size: 13.5px; font-weight: 600; }
+    .doc__head span { display: block; margin-top: 2px; font-size: 11.5px; color: var(--ink3); }
+    .doc__row { display: flex; align-items: baseline; gap: 10px; padding: 10px 14px; }
+    .doc__row + .doc__row { border-top: 1px solid var(--line2); }
+    .doc__row--chg { background: var(--amber-soft); }
+    .doc__row--chg span s { font-weight: 500; color: var(--ink4); margin-right: 6px; }
+    .doc__row--chg em { display: block; margin-top: 2px; font-style: normal; font-size: 11px; font-weight: 600; color: var(--amber-ink); }
+    .resign { display: flex; gap: 10px; margin-top: 12px; padding: 12px; border-radius: 14px; background: var(--amber-soft); border: 1px solid rgba(212, 157, 43, .38); }
+    .resign .sf { color: var(--amber-ink); margin-top: 1px; }
+    .resign p { margin: 0; font-size: 12px; line-height: 1.45; color: var(--amber-ink); }
+    .resign p b { display: block; font-size: 13.5px; margin-bottom: 2px; }
+    .doc__row b { flex: 1; min-width: 0; font-size: 13px; font-weight: 500; }
+    .doc__row span { font: 600 12px/1 var(--mono); color: var(--ink); white-space: nowrap; }
+    .two { margin-top: 14px; padding: 14px; border-radius: 14px; background: var(--navy-soft); }
+    .two__h { margin: 0 0 10px; font-size: 13.5px; font-weight: 600; color: var(--navy-deep); }
+    .two ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+    .two li { display: flex; gap: 10px; font-size: 12.5px; line-height: 1.45; color: var(--ink2); }
+    .two li > i { flex: none; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; font: 700 11px/1 Manrope, sans-serif; font-style: normal; color: #fff; background: var(--navy); }
+    .two li[data-muted] > i { background: var(--card); color: var(--navy); border: 1.5px solid var(--navy); }
+    .two li b { color: var(--ink); font-weight: 600; }
+    .two__foot { margin: 11px 0 0; padding-top: 10px; border-top: 1px solid rgba(22, 72, 160, .15); font-size: 11.5px; line-height: 1.45; color: var(--ink2); }
+
+    .phone[data-net="off"] .net-on { display: none !important; }
+    .phone:not([data-net="off"]) .net-off { display: none !important; }
+    .offline { display: flex; gap: 10px; margin-top: 12px; padding: 12px; border-radius: 14px; background: var(--rec-soft); border: 1px solid rgba(214, 76, 61, .3); }
+    .offline .sf { color: var(--rec-ink); margin-top: 1px; }
+    .offline p { margin: 0; font-size: 12px; line-height: 1.45; color: var(--rec-ink); }
+    .offline p b { display: block; font-size: 13.5px; margin-bottom: 2px; }
+
+    .done { padding-top: 36px; text-align: center; }
+    .done__tick { width: 72px; height: 72px; margin: 0 auto; display: grid; place-items: center; border-radius: 50%; background: var(--navy-soft); color: var(--navy); }
+    .done__tick .sf { width: 32px; height: 32px; stroke-width: 2; }
+    .done h2 { margin: 18px 0 0; font-size: 24px; font-weight: 600; letter-spacing: -.5px; }
+    .done p { margin: 8px auto 0; max-width: 310px; font-size: 13px; line-height: 1.5; color: var(--ink3); }
+    .steps2 { margin-top: 22px; text-align: left; }
+    .st { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+    .st + .st { border-top: 1px solid var(--line2); }
+    .st > i { flex: none; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; }
+    .st[data-s="done"] > i { background: var(--confirm-soft); color: var(--confirm-ink); }
+    .st[data-s="wait"] > i { background: var(--amber-soft); color: var(--amber-ink); }
+    .st > div { flex: 1; }
+    .st b { display: block; font-size: 13.5px; font-weight: 600; }
+    .st span { display: block; margin-top: 2px; font-size: 11.5px; color: var(--ink3); }
+    .st time { font: 600 12px/1 var(--mono); color: var(--ink2); }
+
+    /* ── ОЧЕРЕДЬ ─────────────────────────────────────────────────────────────── */
+    .grp { display: flex; align-items: center; gap: 8px; min-height: var(--tap); margin-top: 14px; }
+    .grp i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+    .grp b { font-size: 13.5px; font-weight: 600; color: var(--ct, var(--ink)); }
+    .grp span { font: 600 11px/1 var(--mono); color: var(--ink4); }
+    .qd { padding: 13px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+    .qd + .qd { margin-top: 10px; }
+    .qd[data-tone="act"] { border-color: rgba(212, 157, 43, .45); }
+    .qd[data-tone="over"] { border-color: rgba(178, 31, 58, .3); }
+    .qd__top { display: flex; align-items: baseline; gap: 8px; }
+    .qd__top b { flex: 1; font-size: 14.5px; font-weight: 600; letter-spacing: -.1px; }
+    .qd__top span { font: 600 11px/1 var(--mono); color: var(--ink3); }
+    .qd__sub { margin-top: 3px; font-size: 12px; color: var(--ink3); }
+    .qd__times { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin: 10px 0 0; font-size: 11.5px; color: var(--ink3); }
+    .qd__times dt { font: 600 9.5px/1.6 var(--mono); letter-spacing: .5px; text-transform: uppercase; color: var(--ink4); }
+    .qd__times dd { margin: 0; color: var(--ink2); font-weight: 500; }
+    .diff { margin-top: 10px; padding: 9px 11px; border-radius: 10px; background: var(--amber-soft); font-size: 12px; line-height: 1.45; color: var(--amber-ink); }
+    .diff s { opacity: .7; }
+    .diff b { font-weight: 700; }
+    .qd__foot { display: flex; gap: 8px; margin-top: 11px; }
+    .qd__note { margin-top: 9px; font-size: 11.5px; line-height: 1.45; color: var(--ink3); }
+
+    /* ── ИСТОРИЯ / ИНСТРУМЕНТЫ ───────────────────────────────────────────────── */
+    .phone[data-htab="tools"] .h-iss { display: none; }
+    .phone:not([data-htab="tools"]) .h-tools { display: none; }
+    .day { display: flex; align-items: baseline; gap: 8px; margin: 18px 0 8px; }
+    .day b { font-size: 13px; font-weight: 600; color: var(--ink2); }
+    .day span { font: 500 11px/1 var(--mono); color: var(--ink3); }
+    .his { display: flex; align-items: flex-start; gap: 11px; width: 100%; min-height: 60px; padding: 11px 14px; border: 0; background: transparent; text-align: left; }
+    .his + .his { border-top: 1px solid var(--line2); }
+    .his__ic { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 10px; background: var(--confirm-soft); color: var(--confirm-ink); }
+    .his__ic[data-s="wait"] { background: var(--amber-soft); color: var(--amber-ink); }
+    .his__txt { display: block; flex: 1; min-width: 0; }
+    .his__l1 { display: flex; gap: 8px; align-items: baseline; }
+    .his__l1 b { flex: 1; font-size: 13.5px; font-weight: 600; }
+    .his__l1 span { font: 500 10.5px/1 var(--mono); color: var(--ink3); }
+    .his__l2 { display: block; margin-top: 3px; font-size: 11.5px; line-height: 1.4; color: var(--ink3); }
+    .his__l2 b { color: var(--ink2); font-weight: 600; }
+    .tool { display: flex; align-items: center; gap: 11px; min-height: 58px; padding: 10px 14px; }
+    .tool + .tool { border-top: 1px solid var(--line2); }
+    .tool__id { flex: none; min-width: 58px; padding: 5px 7px; border-radius: 8px; background: var(--bg); text-align: center; font: 600 11px/1 var(--mono); color: var(--ink2); }
+    .tool__txt { flex: 1; min-width: 0; }
+    .tool__txt b { display: block; font-size: 13.5px; font-weight: 600; }
+    .tool__txt span { display: block; margin-top: 2px; font-size: 11.5px; color: var(--ink3); }
+    .tool__n { font: 600 14px/1 var(--mono); color: var(--ink); }
+    .tool__n small { font: 500 11px Manrope, sans-serif; color: var(--ink3); margin-left: 2px; }
+
+    /* ── СОСТОЯНИЯ ───────────────────────────────────────────────────────────── */
+    .sk { border-radius: 10px; background: linear-gradient(90deg, rgba(12, 27, 56, .06) 25%, rgba(12, 27, 56, .1) 50%, rgba(12, 27, 56, .06) 75%); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+    .empty { margin-top: 16px; padding: 22px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+    .empty__ic { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; background: var(--bg); color: var(--ink3); }
+    .empty b { display: block; margin-top: 12px; font-size: 15px; font-weight: 600; }
+    .empty p { margin: 6px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--ink3); }
+    .empty .btn { margin-top: 14px; }
+    .err { display: flex; gap: 8px; margin-top: 14px; padding: 11px; border-radius: 11px; background: var(--rec-soft); color: var(--rec-ink); font-size: 12.5px; font-weight: 500; line-height: 1.45; }
+    .err .sf { margin-top: 1px; }
+    .stale { opacity: .55; }
+
+    /* ── длинный рендер для PNG (?long=1): экран раскрыт на всю высоту ───────── */
+    .phone.long { height: auto !important; }
+    .phone.long .screen.is-on { overflow: visible; flex: none; }
+    .phone.long .navrow, .phone.long .flowhead { position: static; }
+    .phone.long[data-sheet="1"] .screen.is-on, .phone.long[data-sheet="1"] .tabbar, .phone.long[data-sheet="1"] .scrim, .phone.long[data-sheet="1"] .fab { display: none !important; }
+    .phone.long[data-sheet="1"] .sheet { position: relative; max-height: none; box-shadow: none; }
+    .phone.long[data-sheet="1"] .sheet__body { overflow: visible; }
+  </style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-house" viewBox="0 0 24 24"><path d="M3.5 10.5 12 3.5l8.5 7"/><path d="M5.5 9.5V20.5h13V9.5"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M15.5 5.2a3 3 0 0 1 0 5.8M17.5 14.8c2 .6 3.5 2.4 3.5 5"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-hist" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3L4.5 9"/><path d="M4.5 4.5V9H9"/><path d="M12 8v4.3l2.8 1.7"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.3-4.3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.1"/></symbol>
+  <symbol id="i-wifioff" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M8.5 16.5a5 5 0 0 1 7 0M5 12.8a10 10 0 0 1 4.2-2.3M19 12.8a10 10 0 0 0-3-1.9M2 9.3a15 15 0 0 1 4.5-2.8M22 9.3A15 15 0 0 0 11 5.1"/><path d="M12 20h.01"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6.5 3h8l4 4v14h-12z"/><path d="M14.5 3v4h4M9 12h6M9 16h6"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></symbol>
+  <symbol id="i-tool" viewBox="0 0 24 24"><path d="M14.7 4.3a4.6 4.6 0 0 0-4.3 6.3L4 17l3 3 6.4-6.4a4.6 4.6 0 0 0 6.3-4.3l-2.9 2.9-2.9-.9-.9-2.9z"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M3 6.5h11v10H3zM14 10h4l3 3v3.5h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></symbol>
+  <symbol id="i-take" viewBox="0 0 24 24"><path d="M12 3v11M7.5 9.5 12 14l4.5-4.5"/><path d="M3.5 14v5.5h17V14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.3-4.3L4 8.5M4 4v4.5h4.5M4 13a8 8 0 0 0 14.3 4.3L20 15.5M20 20v-4.5h-4.5"/></symbol>
+  <symbol id="i-tasks" viewBox="0 0 24 24"><path d="M9.5 6h10.5M9.5 12h10.5M9.5 18h10.5"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+</svg>
+
+<div class="stage">
+  <p class="stage__eyebrow">SIG-835 · Склад и снабжение · мобильное приложение</p>
+  <h1>«Материалы» для ассистента и врача — нативный экран Signalo, не веб-кабинет</h1>
+  <div class="flags">
+    <span class="flag flag--mock">Черновой макет · не согласован</span>
+    <span class="flag flag--scope">Токены: Colors.swift / Typography.swift · Color.kt / Type.kt</span>
+  </div>
+
+  <div class="controls">
+    <div class="ctlrow" id="platRow"><span>Платформа</span></div>
+    <div class="ctlrow" id="sceneRow"><span>Экран</span></div>
+  </div>
+
+  <div class="layout">
+    <div class="phone" id="phone" data-p="ios">
+      <!-- статус-бары -->
+      <div class="statusbar ios-only flexy"><span>14:32</span><span class="statusbar__right"><span class="bars"><span></span><span></span><span></span><span></span></span><span class="batt"></span></span></div>
+      <div class="sb-and and-only flexy"><span>14:32</span><span class="sb-and__icons"><i></i><b></b></span></div>
+
+      <!-- ═════════ 0. «Ещё» — точка входа ═════════ -->
+      <section class="screen" data-screen="more" aria-label="Ещё">
+        <div class="pad">
+          <p class="eyebrow" style="margin-top:14px">Анна Л. · ассистент</p>
+          <div class="titlerow"><h2>Ещё</h2></div>
+          <div class="card" style="margin-top:14px">
+            <button class="row" type="button" data-go="overview">
+              <svg class="sf"><use href="#i-box"/></svg>
+              <span class="row__txt"><b>Материалы</b><span>Заявки кабинета, получение со склада</span></span>
+              <span class="redbadge" aria-label="1 выдача требует вашего действия">1</span>
+              <svg class="sf sf--sm row__chev"><use href="#i-right"/></svg>
+            </button>
+            <button class="row" type="button"><svg class="sf"><use href="#i-tasks"/></svg><span class="row__txt"><b>Мои задачи</b><span>Звонки и напоминания пациентам</span></span><svg class="sf sf--sm row__chev"><use href="#i-right"/></svg></button>
+            <button class="row" type="button"><svg class="sf"><use href="#i-mic"/></svg><span class="row__txt"><b>История приёмов</b><span>Записи и заметки</span></span><svg class="sf sf--sm row__chev"><use href="#i-right"/></svg></button>
+            <button class="row" type="button"><svg class="sf"><use href="#i-gear"/></svg><span class="row__txt"><b>Настройки аккаунта</b><span>Профиль, безопасность, поддержка</span></span><svg class="sf sf--sm row__chev"><use href="#i-right"/></svg></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═════════ 1. Обзор ═════════ -->
+      <section class="screen" data-screen="overview" aria-label="Материалы">
+        <div class="navrow">
+          <button class="navchip ios-only flexy" type="button" data-go="more"><svg class="sf sf--sm"><use href="#i-left"/></svg>Ещё</button>
+          <button class="backand and-only flexy" type="button" data-go="more"><b>←</b>НАЗАД</button>
+        </div>
+        <div class="pad">
+          <p class="eyebrow">Материалы · Кабинет 5</p>
+          <div class="titlerow">
+            <h2>Материалы</h2>
+            <button class="hicon" type="button" data-go="history" aria-label="История выдач и инструменты"><svg class="sf"><use href="#i-hist"/></svg></button>
+          </div>
+          <div class="bar bar--teal"><svg class="sf sf--sm"><use href="#i-cal"/></svg><span>Плановые заявки принимаются до <b>пн, 28 сен, 09:00</b></span></div>
+
+          <p class="label">Заказываю для</p>
+          <div class="chips chips--scroll" data-group="rcp">
+            <button class="chip" type="button" aria-pressed="true">Кабинет 5</button>
+            <button class="chip" type="button" aria-pressed="false">Соколова Е. В. <small>врач</small></button>
+            <button class="chip" type="button" aria-pressed="false">ЦСО</button>
+          </div>
+
+          <div class="ready">
+            <div class="ready__top">
+              <span class="ready__ic"><svg class="sf"><use href="#i-take"/></svg></span>
+              <div class="ready__txt">
+                <div class="ready__eyebrow">Готово к получению</div>
+                <p class="ready__title">З-114 · 3 позиции собраны</p>
+                <p class="ready__sub">Закупщик подготовил сегодня в 12:10. Ещё 2 позиции по этой заявке в пути.</p>
+              </div>
+            </div>
+            <ul class="ready__items"><li>Перчатки нитриловые S · 4 уп.</li><li>Слюноотсосы · 4 уп.</li><li>Fuji Plus · 1 наб.</li></ul>
+            <div class="ready__acts">
+              <button class="btn" type="button" data-go="request">Заявка</button>
+              <button class="btn btn--primary btn--grow" type="button" data-go="receive"><svg class="sf sf--sm"><use href="#i-take"/></svg>Получить</button>
+            </div>
+          </div>
+
+          <button class="wait" type="button" data-go="queue">
+            <svg class="sf"><use href="#i-pen"/></svg>
+            <span class="wait__txt"><b>Нужна ваша повторная подпись · 1</b><span>Ещё 2 выдачи ждут подтверждения закупщика</span></span>
+            <svg class="sf sf--sm"><use href="#i-right"/></svg>
+          </button>
+
+          <p class="label">Ожидается <b>4</b><button class="more-link" type="button" data-go="requests">Все заявки<svg class="sf sf--sm"><use href="#i-right"/></svg></button></p>
+          <div class="card">
+            <div class="exp"><span class="exp__name">Estelite Asteria A2B</span><span class="exp__qty">2 шпр.</span>
+              <span class="exp__st" style="--c:var(--navy);--ct:var(--navy)"><i></i><b>Поставка подтверждена</b><span>ожидается 29 сен</span></span></div>
+            <div class="exp"><span class="exp__name">Ретракционная нить Ultrapak #00</span><span class="exp__qty">1 уп.</span>
+              <span class="exp__st" style="--c:var(--ink4)"><i></i><b>Оплачено</b><span>дата поставки не подтверждена</span></span></div>
+            <div class="exp"><span class="exp__name">Single Bond Universal</span><span class="exp__qty">1 фл.</span>
+              <span class="exp__st" style="--c:var(--amber);--ct:var(--amber-ink)"><i></i><b>Задержка</b><span>теперь 2 окт, было <s>26 сен</s></span></span></div>
+            <div class="exp"><span class="exp__name">Коффердам латексный</span><span class="exp__qty">1 уп.</span>
+              <span class="exp__st" style="--c:var(--ink4)"><i></i><b>Ещё не заказано</b><span>ждёт с недели 14–18 сен</span></span></div>
+          </div>
+          <p class="foot-note">Повторять эти позиции в новой заявке не нужно — они уже в работе. Дата появится только после подтверждения поставщиком.</p>
+
+          <button class="urgent" type="button" data-go="urgent">
+            <svg class="sf"><use href="#i-bolt"/></svg>
+            <span class="urgent__txt"><b>Срочно, не дожидаясь сбора</b>Отдельное обращение — закупщик увидит сразу</span>
+            <svg class="sf sf--sm row__chev"><use href="#i-right"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ═════════ 3. Заявки ═════════ -->
+      <section class="screen" data-screen="requests" aria-label="Заявки">
+        <div class="navrow">
+          <button class="navchip ios-only flexy" type="button" data-go="overview"><svg class="sf sf--sm"><use href="#i-left"/></svg>Материалы</button>
+          <button class="backand and-only flexy" type="button" data-go="overview"><b>←</b>НАЗАД</button>
+        </div>
+        <div class="pad">
+          <p class="eyebrow">Заявки · Кабинет 5 · 13</p>
+          <div class="titlerow"><h2>Заявки</h2></div>
+          <div class="chips chips--scroll" data-group="rqf" style="margin-top:12px">
+            <button class="chip" type="button" aria-pressed="true">В работе <b>3</b></button>
+            <button class="chip" type="button" aria-pressed="false">Срочные <b>1</b></button>
+            <button class="chip" type="button" aria-pressed="false">Черновики <b>1</b></button>
+            <button class="chip" type="button" aria-pressed="false">Завершённые <b>8</b></button>
+          </div>
+          <p class="foot-note" style="margin-top:10px">Видны заявки Кабинета 5 и врача Соколовой Е. В. Заявки коллег можно смотреть и получать по ним, но править может только автор.</p>
+
+          <article class="rq">
+            <div class="rq__top"><div><div class="rq__id">З-114 · ТЕРАПИЯ</div><p class="rq__title">Кабинет 5 · 5 позиций</p></div><span class="pill pill--confirm">Готово 3 из 5</span></div>
+            <div class="prog" aria-hidden="true"><i data-s="done"></i><i data-s="done"></i><i data-s="done"></i><i data-s="way"></i><i data-s="way"></i></div>
+            <div class="prog__cap">3 собраны · 1 в пути · 1 оплачена, дата не подтверждена</div>
+            <div class="rq__foot">
+              <span class="who who--me"><i>А</i>Анна Л. · я</span>
+              <button class="btn" type="button" data-go="request">Открыть</button>
+              <button class="btn btn--primary" type="button" data-go="receive">Получить</button>
+            </div>
+          </article>
+
+          <article class="rq" data-tone="urgent">
+            <div class="rq__top"><div><div class="rq__id">З-116 · ТЕРАПИЯ</div><p class="rq__title">Соколова Е. В. · 1 позиция</p></div><span class="pill pill--rec">Срочная</span></div>
+            <div class="rq__meta"><span class="mchip"><svg class="sf"><use href="#i-clock"/></svg>передана закупщику сегодня, 10:14</span><span class="mchip">нужно к 26 сен</span></div>
+            <div class="rq__foot">
+              <span class="who who--me"><i>А</i>Анна Л. · я</span>
+              <button class="btn" type="button" data-go="request">Открыть</button>
+            </div>
+          </article>
+
+          <article class="rq">
+            <div class="rq__top"><div><div class="rq__id">З-111 · ОБЩИЕ</div><p class="rq__title">Кабинет 5 · 4 позиции</p></div><span class="pill pill--navy">Заказано</span></div>
+            <div class="prog" aria-hidden="true"><i data-s="way"></i><i data-s="way"></i><i></i><i></i></div>
+            <div class="prog__cap">2 подтверждены к поставке · 2 ещё не заказаны</div>
+            <div class="rq__foot">
+              <span class="who"><i>О</i>Ольга Р.</span>
+              <button class="btn" type="button" data-go="request">Открыть</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ═════════ 3б. Заявка ═════════ -->
+      <section class="screen" data-screen="request" aria-label="Заявка З-114">
+        <div class="navrow">
+          <button class="navchip ios-only flexy" type="button" data-go="requests"><svg class="sf sf--sm"><use href="#i-left"/></svg>Заявки</button>
+          <button class="backand and-only flexy" type="button" data-go="requests"><b>←</b>НАЗАД</button>
+        </div>
+        <div class="pad">
+          <div class="dhead">
+            <p class="eyebrow">Заявка З-114 · Терапия</p>
+            <h2>Кабинет 5</h2>
+            <p class="dhead__meta">Автор Анна Л. (вы) · создана 21 сен · нужно к 29 сен</p>
+            <div class="dhead__pills"><span class="pill pill--plain">Плановая</span><span class="pill pill--plain">Версия 3</span><span class="pill pill--confirm">Готово 3 из 5</span></div>
+          </div>
+
+          <p class="label">Позиции <b>5</b></p>
+          <div class="card">
+            <div class="pos"><div class="pos__top"><span class="pos__name">Перчатки нитриловые S</span><span class="pos__q">4 уп.</span></div>
+              <div class="pos__st"><span class="pill pill--confirm">Собрано · можно забрать</span></div></div>
+            <div class="pos"><div class="pos__top"><span class="pos__name">Слюноотсосы одноразовые</span><span class="pos__q">6 уп.</span></div>
+              <div class="pos__sub">Обеспечивается сейчас 4 уп., 2 уп. отложены на следующую сводку</div>
+              <div class="pos__st"><span class="pill pill--confirm">Собрано 4</span><span class="pill pill--plain">Отложено 2</span></div></div>
+            <div class="pos"><div class="pos__top"><span class="pos__name">Fuji Plus</span><span class="pos__q">1 наб.</span></div>
+              <div class="pos__st"><span class="pill pill--confirm">Собрано · можно забрать</span></div></div>
+            <div class="pos"><div class="pos__top"><span class="pos__name">Estelite Asteria A2B</span><span class="pos__q">2 шпр.</span></div>
+              <div class="pos__st"><span class="pill pill--navy">Поставка подтверждена · 29 сен</span></div></div>
+            <div class="pos"><div class="pos__top"><span class="pos__name">Ретракционная нить Ultrapak #00</span><span class="pos__q">1 уп.</span></div>
+              <div class="pos__st"><span class="pill pill--plain">Оплачено · дата не подтверждена</span></div></div>
+          </div>
+
+          <p class="label">История версий</p>
+          <ol class="vtl">
+            <li data-now><i></i><div class="vtl__h">Версия 3 <span>24 сен, 16:05</span></div><div class="vtl__who">Марина К., закупщик</div>
+              <div class="vtl__what">Слюноотсосы: обеспечивается <b>4</b> из 6 уп., 2 уп. отложены. Ваше исходное количество сохранено.</div></li>
+            <li><i></i><div class="vtl__h">Версия 2 <span>22 сен, 09:40</span></div><div class="vtl__who">Анна Л. (вы)</div>
+              <div class="vtl__what">Estelite Asteria A2B: <s>1</s> → 2 шпр.</div></li>
+            <li><i></i><div class="vtl__h">Версия 1 <span>21 сен, 18:12</span></div><div class="vtl__who">Анна Л. (вы)</div>
+              <div class="vtl__what">Заявка создана, 5 позиций.</div></li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ═════════ 4. Получение — шаг 1 ═════════ -->
+      <section class="screen" data-screen="receive" aria-label="Получение со склада">
+        <div class="flowhead">
+          <span class="pills" aria-hidden="true"><i data-s="cur"></i><i></i></span>
+          <span class="flowhead__step">Шаг 1 из 2</span>
+          <button class="sh-close" type="button" data-go="overview">Отмена</button>
+        </div>
+        <div class="pad">
+          <p class="eyebrow">Получение со склада</p>
+          <div class="titlerow"><h2>Что вы забираете</h2></div>
+
+          <p class="label">Для кого</p>
+          <div data-group="rcp2">
+            <button class="rcp" type="button" aria-pressed="true"><span class="due__radio"></span><span class="rcp__t"><b>Кабинет 5</b><span>мой кабинет</span></span></button>
+            <button class="rcp" type="button" aria-pressed="false"><span class="due__radio"></span><span class="rcp__t"><b>Соколова Е. В.</b><span>врач · по поручению до 30 сен</span></span></button>
+            <button class="rcp" type="button" aria-pressed="false"><span class="due__radio"></span><span class="rcp__t"><b>ЦСО</b><span>стерилизационная</span></span></button>
+          </div>
+
+          <p class="label">Откуда список</p>
+          <div class="seg" data-group="src">
+            <button type="button" aria-pressed="true">Из заявки З-114 <b>3</b></button>
+            <button type="button" aria-pressed="false">С нуля</button>
+          </div>
+
+          <p class="label">Фактически взято <b>4</b></p>
+          <div class="card">
+            <div class="take"><div class="take__top">
+              <button class="check" type="button" aria-pressed="true" aria-label="Взяла"><i><svg class="sf sf--sm"><use href="#i-check"/></svg></i></button>
+              <span class="take__txt"><b>Перчатки нитриловые S</b><span>собрано 4 уп.</span></span>
+              <span class="stepper"><button type="button" data-step="-1" aria-label="Меньше"><svg class="sf sf--sm"><use href="#i-minus"/></svg></button><output>4<small>уп.</small></output><button type="button" data-step="1" aria-label="Больше"><svg class="sf sf--sm"><use href="#i-plus"/></svg></button></span>
+            </div></div>
+            <div class="take"><div class="take__top">
+              <button class="check" type="button" aria-pressed="true" aria-label="Взяла"><i><svg class="sf sf--sm"><use href="#i-check"/></svg></i></button>
+              <span class="take__txt"><b>Слюноотсосы одноразовые</b><span>собрано 4 уп.</span></span>
+              <span class="stepper"><button type="button" data-step="-1" aria-label="Меньше"><svg class="sf sf--sm"><use href="#i-minus"/></svg></button><output>3<small>уп.</small></output><button type="button" data-step="1" aria-label="Больше"><svg class="sf sf--sm"><use href="#i-plus"/></svg></button></span>
+            </div>
+              <p class="take__warn">Берёте меньше собранного: 1 уп. останется ждать по заявке.</p></div>
+            <div class="take"><div class="take__top">
+              <button class="check" type="button" aria-pressed="true" aria-label="Взяла"><i><svg class="sf sf--sm"><use href="#i-check"/></svg></i></button>
+              <span class="take__txt"><b>Fuji Plus</b><span>собрано 1 наб.</span></span>
+              <span class="stepper"><button type="button" data-step="-1" aria-label="Меньше"><svg class="sf sf--sm"><use href="#i-minus"/></svg></button><output>1<small>наб.</small></output><button type="button" data-step="1" aria-label="Больше"><svg class="sf sf--sm"><use href="#i-plus"/></svg></button></span>
+            </div></div>
+            <div class="take"><div class="take__top">
+              <button class="check" type="button" aria-pressed="true" aria-label="Взяла"><i><svg class="sf sf--sm"><use href="#i-check"/></svg></i></button>
+              <span class="take__txt"><b>Валики ватные №2</b><span>добавлено вручную <em class="tag">не из заявки</em></span></span>
+              <span class="stepper"><button type="button" data-step="-1" aria-label="Меньше"><svg class="sf sf--sm"><use href="#i-minus"/></svg></button><output>1<small>уп.</small></output><button type="button" data-step="1" aria-label="Больше"><svg class="sf sf--sm"><use href="#i-plus"/></svg></button></span>
+            </div></div>
+          </div>
+          <button class="addmat" type="button"><svg class="sf sf--sm"><use href="#i-plus"/></svg>Добавить материал не из заявки</button>
+        </div>
+      </section>
+
+      <!-- ═════════ 4б. Получение — шаг 2 (и 4г NET-01) ═════════ -->
+      <section class="screen" data-screen="confirm" aria-label="Подтверждение получения">
+        <div class="flowhead">
+          <span class="pills" aria-hidden="true"><i data-s="done"></i><i data-s="cur"></i></span>
+          <span class="flowhead__step">Шаг 2 из 2</span>
+          <button class="sh-close" type="button" data-go="overview">Отмена</button>
+        </div>
+        <div class="pad">
+          <p class="eyebrow">Получение со склада</p>
+          <div class="titlerow"><h2>Проверьте список</h2></div>
+
+          <div class="offline net-off" role="alert">
+            <svg class="sf"><use href="#i-wifioff"/></svg>
+            <p><b>Нет связи с сервером</b>Список сохранён на этом телефоне как черновик. Подпись не отправлена, материал не зарезервирован, закупщик выдачу пока не видит.</p>
+          </div>
+
+          <div class="doc">
+            <div class="doc__head">
+              <svg class="sf" style="color:var(--ink3)"><use href="#i-doc"/></svg>
+              <div><b>Кабинет 5</b><span>получаете вы · З-114 и 1 вне заявки</span></div>
+              <span class="pill pill--plain net-on">Не подписан</span>
+              <span class="pill pill--amber net-off">Не отправлен</span>
+            </div>
+            <div class="doc__row"><b>Перчатки нитриловые S</b><span>4 уп.</span></div>
+            <div class="doc__row"><b>Слюноотсосы одноразовые</b><span>3 уп.</span></div>
+            <div class="doc__row"><b>Fuji Plus</b><span>1 наб.</span></div>
+            <div class="doc__row"><b>Валики ватные №2</b><span>1 уп.</span></div>
+          </div>
+
+          <div class="two">
+            <p class="two__h">Выдача подтверждается двумя подписями</p>
+            <ol>
+              <li><i>1</i><span><b>Вы — сейчас.</b> Подтверждаете, что взяли именно это. Материал резервируется за Кабинетом 5.</span></li>
+              <li data-muted><i>2</i><span><b>Закупщик — сегодня.</b> Подтверждает тот же список. Только после этого выдача проведена.</span></li>
+            </ol>
+            <p class="two__foot">Если закупщик исправит количество, список вернётся к вам на повторную подпись.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═════════ 4в. После ответа сервера ═════════ -->
+      <section class="screen" data-screen="sent" aria-label="Список подтверждён">
+        <div class="pad done">
+          <div class="done__tick"><svg class="sf"><use href="#i-pen"/></svg></div>
+          <h2>Вы подписали список</h2>
+          <p>Выдача В-0231 ждёт подтверждения закупщика. Пока его подписи нет, выдача не проведена — материал зарезервирован за Кабинетом 5.</p>
+          <div class="card steps2">
+            <div class="st" data-s="done"><i><svg class="sf sf--sm"><use href="#i-check"/></svg></i><div><b>Ваша подпись</b><span>Анна Л. · 4 позиции</span></div><time>14:32</time></div>
+            <div class="st" data-s="wait"><i><svg class="sf sf--sm"><use href="#i-clock"/></svg></i><div><b>Подпись закупщика</b><span>Марина К. · ожидается сегодня</span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═════════ 5б. Повторная подпись после правки закупщика (ISS-04) ═════════ -->
+      <section class="screen" data-screen="resign" aria-label="Повторная подпись">
+        <div class="navrow">
+          <button class="navchip ios-only flexy" type="button" data-go="queue"><svg class="sf sf--sm"><use href="#i-left"/></svg>Ждут подписи</button>
+          <button class="backand and-only flexy" type="button" data-go="queue"><b>←</b>НАЗАД</button>
+        </div>
+        <div class="pad">
+          <p class="eyebrow">Выдача В-0229 · Кабинет 5</p>
+          <div class="titlerow"><h2>Список изменён</h2></div>
+          <div class="resign" role="status">
+            <svg class="sf"><use href="#i-alert"/></svg>
+            <p><b>Ваша прежняя подпись снята</b>Марина К., закупщик, изменила количество после вашей подписи. Выдача не проведена, пока вы не подпишете исправленный список.</p>
+          </div>
+          <div class="doc">
+            <div class="doc__head">
+              <svg class="sf" style="color:var(--ink3)"><use href="#i-doc"/></svg>
+              <div><b>Кабинет 5</b><span>получали вы · 24 сен, 16:32</span></div>
+              <span class="pill pill--amber">Нужна подпись</span>
+            </div>
+            <div class="doc__row doc__row--chg"><b>Коффердам латексный<em>изменено закупщиком</em></b><span><s>2 уп.</s>1 уп.</span></div>
+            <div class="doc__row"><b>Перчатки нитриловые M</b><span>2 уп.</span></div>
+            <div class="doc__row"><b>Слюноотсосы одноразовые</b><span>2 уп.</span></div>
+            <div class="doc__row"><b>Валики ватные №2</b><span>2 уп.</span></div>
+            <div class="doc__row"><b>Ретракционная нить Ultrapak #00</b><span>1 уп.</span></div>
+          </div>
+          <p class="foot-note">Взяли не столько, сколько указано? Нажмите «Взяла другое» — закупщик разберёт расхождение, выдача пока останется не проведённой.</p>
+        </div>
+      </section>
+
+      <!-- ═════════ 5. Очередь подтверждений ═════════ -->
+      <section class="screen" data-screen="queue" aria-label="Ждут подтверждения">
+        <div class="navrow">
+          <button class="navchip ios-only flexy" type="button" data-go="overview"><svg class="sf sf--sm"><use href="#i-left"/></svg>Материалы</button>
+          <button class="backand and-only flexy" type="button" data-go="overview"><b>←</b>НАЗАД</button>
+        </div>
+        <div class="pad">
+          <p class="eyebrow">Выдачи · не проведены · 3</p>
+          <div class="titlerow"><h2>Ждут подписи</h2></div>
+          <div class="bar bar--teal"><svg class="sf sf--sm"><use href="#i-pen"/></svg><span>Выдача проводится только после подписи закупщика. Сама по времени она не проведётся.</span></div>
+
+          <div class="grp" style="--c:var(--amber)"><i></i><b>Нужна ваша подпись</b><span>1</span></div>
+          <article class="qd" data-tone="act">
+            <div class="qd__top"><b>В-0229 · Кабинет 5</b><span>5 поз.</span></div>
+            <div class="qd__sub">Закупщик исправил список после вашей подписи</div>
+            <div class="diff">Коффердам латексный: <s>2 уп.</s> → <b>1 уп.</b></div>
+            <div class="qd__foot"><button class="btn btn--primary btn--grow" type="button" data-go="resign">Проверить и подписать</button></div>
+          </article>
+
+          <div class="grp" style="--c:var(--navy)"><i></i><b>Ждут закупщика</b><span>1</span></div>
+          <article class="qd">
+            <div class="qd__top"><b>В-0231 · Кабинет 5</b><span>4 поз.</span></div>
+            <dl class="qd__times"><dt>Получено</dt><dd>сегодня, 14:30</dd><dt>Ваша подпись</dt><dd>сегодня, 14:32</dd><dt>Закупщик</dt><dd>ожидается сегодня</dd></dl>
+          </article>
+
+          <div class="grp" style="--c:var(--rec);--ct:var(--rec-ink)"><i></i><b>Просрочено</b><span>1</span></div>
+          <article class="qd" data-tone="over">
+            <div class="qd__top"><b>В-0224 · Соколова Е. В.</b><span>6 поз.</span></div>
+            <dl class="qd__times"><dt>Получено</dt><dd>вчера, 17:50</dd><dt>Ваша подпись</dt><dd>вчера, 17:52</dd><dt>Закупщик</dt><dd style="color:var(--rec-ink)">не подписал · ждёт с вчера</dd></dl>
+            <p class="qd__note">Закупщику ушло напоминание. От вас ничего не нужно.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ═════════ 6. История выдач / инструменты ═════════ -->
+      <section class="screen" data-screen="history" aria-label="История и инструменты">
+        <div class="navrow">
+          <button class="navchip ios-only flexy" type="button" data-go="overview"><svg class="sf sf--sm"><use href="#i-left"/></svg>Материалы</button>
+          <button class="backand and-only flexy" type="button" data-go="overview"><b>←</b>НАЗАД</button>
+        </div>
+        <div class="pad">
+          <p class="eyebrow">Кабинет 5 · Соколова Е. В. · ЦСО</p>
+          <div class="titlerow"><h2 class="h-iss">История выдач</h2><h2 class="h-tools">Инструменты</h2></div>
+          <div class="seg" data-group="htab" style="margin-top:12px">
+            <button type="button" data-htab="iss" aria-pressed="true">Выдачи</button>
+            <button type="button" data-htab="tools" aria-pressed="false">Инструменты <b>9</b></button>
+          </div>
+
+          <div class="h-iss">
+            <div class="day"><b>Сегодня</b><span>25 сен</span></div>
+            <div class="card">
+              <button class="his" type="button" data-go="queue"><span class="his__ic" data-s="wait"><svg class="sf sf--sm"><use href="#i-clock"/></svg></span><span class="his__txt">
+                <span class="his__l1"><b>В-0231 · Кабинет 5</b><span>14:32</span></span>
+                <span class="his__l2">4 позиции · получила <b>Анна Л. (вы)</b> · ждёт закупщика</span></span></button>
+            </div>
+            <div class="day"><b>Вчера</b><span>24 сен</span></div>
+            <div class="card">
+              <button class="his" type="button"><span class="his__ic" data-s="wait"><svg class="sf sf--sm"><use href="#i-clock"/></svg></span><span class="his__txt">
+                <span class="his__l1"><b>В-0224 · Соколова Е. В.</b><span>17:52</span></span>
+                <span class="his__l2">6 позиций · получила <b>Анна Л. (вы)</b> · не подписана закупщиком</span></span></button>
+            </div>
+            <div class="day"><b>22 сен</b><span>вт</span></div>
+            <div class="card">
+              <button class="his" type="button"><span class="his__ic"><svg class="sf sf--sm"><use href="#i-check"/></svg></span><span class="his__txt">
+                <span class="his__l1"><b>В-0219 · Кабинет 5</b><span>11:05</span></span>
+                <span class="his__l2">3 позиции · получила <b>Ольга Р.</b> по вашей заявке З-108 · проведена</span></span></button>
+              <button class="his" type="button"><span class="his__ic"><svg class="sf sf--sm"><use href="#i-check"/></svg></span><span class="his__txt">
+                <span class="his__l1"><b>В-0217 · ЦСО</b><span>09:20</span></span>
+                <span class="his__l2">2 позиции · получила <b>Анна Л. (вы)</b> · проведена</span></span></button>
+            </div>
+          </div>
+
+          <div class="h-tools">
+            <p class="label">Кабинет 5 · по номерам <b>3</b></p>
+            <div class="card">
+              <div class="tool"><span class="tool__id">НК-014</span><span class="tool__txt"><b>Наконечник турбинный</b><span>закреплён 12 авг · подтвердила Анна Л.</span></span></div>
+              <div class="tool"><span class="tool__id">НК-021</span><span class="tool__txt"><b>Наконечник угловой</b><span>закреплён 12 авг · подтвердила Анна Л.</span></span></div>
+              <div class="tool"><span class="tool__id">СК-003</span><span class="tool__txt"><b>Скейлер ультразвуковой</b><span>закреплён 3 сен · подтвердила Ольга Р.</span></span></div>
+            </div>
+            <p class="label">Кабинет 5 · по количеству <b>3</b></p>
+            <div class="card">
+              <div class="tool"><span class="tool__txt"><b>Зеркало стоматологическое</b><span>обновлено 22 сен</span></span><span class="tool__n">12<small>шт.</small></span></div>
+              <div class="tool"><span class="tool__txt"><b>Зонд угловой</b><span>обновлено 22 сен</span></span><span class="tool__n">8<small>шт.</small></span></div>
+              <div class="tool"><span class="tool__txt"><b>Пинцет стоматологический</b><span>обновлено 12 авг</span></span><span class="tool__n">6<small>шт.</small></span></div>
+            </div>
+            <p class="label">Соколова Е. В. · врач <b>3</b></p>
+            <div class="card">
+              <div class="tool"><span class="tool__id">КЛ-007</span><span class="tool__txt"><b>Ключ динамометрический</b><span>закреплён 1 сен</span></span></div>
+              <div class="tool"><span class="tool__txt"><b>Кюрета Грейси 5/6</b><span>обновлено 1 сен</span></span><span class="tool__n">2<small>шт.</small></span></div>
+              <div class="tool"><span class="tool__txt"><b>Экскаватор</b><span>обновлено 1 сен</span></span><span class="tool__n">1<small>шт.</small></span></div>
+            </div>
+            <p class="foot-note">Сломался или потерялся инструмент — сообщите закупщику, выбытие оформляет он.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═════════ Состояния ═════════ -->
+      <section class="screen" data-screen="loading" aria-label="Загрузка" aria-busy="true">
+        <div class="navrow">
+          <button class="navchip ios-only flexy" type="button" data-go="more"><svg class="sf sf--sm"><use href="#i-left"/></svg>Ещё</button>
+          <button class="backand and-only flexy" type="button" data-go="more"><b>←</b>НАЗАД</button>
+        </div>
+        <div class="pad">
+          <p class="eyebrow">Материалы · Кабинет 5</p>
+          <div class="titlerow"><h2>Материалы</h2></div>
+          <div class="sk" style="height:34px;margin-top:12px"></div>
+          <div class="sk" style="height:44px;width:70%;margin-top:22px;border-radius:999px"></div>
+          <div class="sk" style="height:168px;margin-top:14px;border-radius:16px"></div>
+          <div class="sk" style="height:56px;margin-top:10px;border-radius:14px"></div>
+          <div class="sk" style="height:12px;width:40%;margin-top:24px"></div>
+          <div class="sk" style="height:220px;margin-top:10px;border-radius:14px"></div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="empty" aria-label="Пусто">
+        <div class="navrow">
+          <button class="navchip ios-only flexy" type="button" data-go="more"><svg class="sf sf--sm"><use href="#i-left"/></svg>Ещё</button>
+          <button class="backand and-only flexy" type="button" data-go="more"><b>←</b>НАЗАД</button>
+        </div>
+        <div class="pad">
+          <p class="eyebrow">Материалы · Кабинет 5</p>
+          <div class="titlerow"><h2>Материалы</h2></div>
+          <div class="bar bar--teal"><svg class="sf sf--sm"><use href="#i-cal"/></svg><span>Плановые заявки принимаются до <b>пн, 28 сен, 09:00</b></span></div>
+          <div class="empty">
+            <span class="empty__ic"><svg class="sf"><use href="#i-box"/></svg></span>
+            <b>Заявок пока нет</b>
+            <p>Здесь появятся заявки Кабинета 5, ожидаемые поставки и то, что готово к получению. Получить материал со склада можно и без заявки.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn--primary" type="button" data-go="new"><svg class="sf sf--sm"><use href="#i-plus"/></svg>Новая заявка</button>
+              <button class="btn" type="button" data-go="receive">Получить без заявки</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="error" aria-label="Ошибка загрузки">
+        <div class="navrow">
+          <button class="navchip ios-only flexy" type="button" data-go="more"><svg class="sf sf--sm"><use href="#i-left"/></svg>Ещё</button>
+          <button class="backand and-only flexy" type="button" data-go="more"><b>←</b>НАЗАД</button>
+        </div>
+        <div class="pad">
+          <p class="eyebrow">Материалы · Кабинет 5</p>
+          <div class="titlerow"><h2>Материалы</h2></div>
+          <div class="err" role="alert"><svg class="sf sf--sm"><use href="#i-alert"/></svg><span>Не удалось обновить данные. Ниже — то, что было загружено в 13:05. Статусы могли измениться.</span></div>
+          <button class="btn" type="button" style="margin-top:10px"><svg class="sf sf--sm"><use href="#i-refresh"/></svg>Обновить</button>
+          <div class="stale">
+            <div class="ready">
+              <div class="ready__top"><span class="ready__ic"><svg class="sf"><use href="#i-take"/></svg></span>
+                <div class="ready__txt"><div class="ready__eyebrow">Готово к получению · на 13:05</div><p class="ready__title">З-114 · 3 позиции собраны</p></div></div>
+              <button class="btn btn--primary" type="button" disabled style="width:100%;margin-top:12px;opacity:.45">Получить</button>
+              <p class="foot-note" style="margin-top:8px">Получить можно, когда данные обновятся: иначе есть риск забрать уже выданное коллегой.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="noaccess" aria-label="Нет получателей">
+        <div class="navrow">
+          <button class="navchip ios-only flexy" type="button" data-go="more"><svg class="sf sf--sm"><use href="#i-left"/></svg>Ещё</button>
+          <button class="backand and-only flexy" type="button" data-go="more"><b>←</b>НАЗАД</button>
+        </div>
+        <div class="pad">
+          <p class="eyebrow">Материалы</p>
+          <div class="titlerow"><h2>Материалы</h2></div>
+          <div class="empty">
+            <span class="empty__ic"><svg class="sf"><use href="#i-lock"/></svg></span>
+            <b>Вы пока ни за кого не заказываете</b>
+            <p>Заявки подаются за кабинет или врача, к которым вы привязаны: постоянно, по смене или по поручению. Попросите руководителя или закупщика назначить вас.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- нижние панели действий -->
+      <div class="bbar" data-for="request">
+        <button class="cta" type="button" data-go="receive"><svg class="sf"><use href="#i-take"/></svg>Получить готовое · 3 позиции</button>
+      </div>
+      <div class="bbar" data-for="receive">
+        <button class="cta" type="button" data-go="confirm">Дальше · 4 позиции</button>
+      </div>
+      <div class="bbar" data-for="confirm">
+        <div class="net-on">
+          <button class="cta" type="button" data-go="sent"><svg class="sf"><use href="#i-pen"/></svg>Подписать получение</button>
+          <button class="cta--ghost" type="button" data-go="receive">Назад к списку</button>
+        </div>
+        <div class="net-off">
+          <button class="cta cta--ink" type="button"><svg class="sf"><use href="#i-refresh"/></svg>Отправить снова</button>
+          <button class="cta--ghost" type="button" data-go="overview">Оставить черновик и выйти</button>
+          <p class="ctanote">Повтор не создаст второй документ: сначала проверим, не дошёл ли первый.</p>
+        </div>
+      </div>
+      <div class="bbar" data-for="resign">
+        <button class="cta" type="button" data-go="queue"><svg class="sf"><use href="#i-pen"/></svg>Подписать исправленный список</button>
+        <button class="cta--ghost" type="button">Взяла другое</button>
+      </div>
+      <div class="bbar" data-for="sent">
+        <button class="cta" type="button" data-go="overview">Готово</button>
+        <button class="cta--ghost" type="button" data-go="queue">Все выдачи, ждущие подписи</button>
+      </div>
+
+      <button class="fab" type="button" data-go="new"><svg class="sf"><use href="#i-plus"/></svg>Новая заявка</button>
+
+      <nav class="tabbar" aria-label="Разделы приложения">
+        <button type="button"><svg class="sf sf--tab"><use href="#i-house"/></svg>Главная</button>
+        <button type="button"><svg class="sf sf--tab"><use href="#i-cal"/></svg>Расписание</button>
+        <button type="button"><svg class="sf sf--tab"><use href="#i-people"/></svg>Пациенты</button>
+        <button type="button" aria-current="page" data-go="more"><svg class="sf sf--tab"><use href="#i-more"/></svg>Ещё<span class="tab-badge">1</span></button>
+      </nav>
+
+      <!-- ═════════ 2. Новая заявка / срочное обращение (лист) ═════════ -->
+      <div class="scrim" data-go="overview"></div>
+      <div class="sheet" role="dialog" aria-modal="true" aria-label="Новая заявка">
+        <div class="grab"></div>
+        <div class="sheet__body">
+          <div class="sh-head">
+            <div class="sh-head__txt">
+              <p class="eyebrow m-plan">Новая заявка · плановая</p>
+              <p class="eyebrow m-urgent" style="color:var(--rec-ink)">Срочное обращение</p>
+              <h3 class="m-plan">Новая заявка</h3>
+              <h3 class="m-urgent">Срочно нужно</h3>
+              <p class="m-plan">Уйдёт закупщику в сводку недели. Приём до <b>пн, 28 сен, 09:00</b>.</p>
+              <p class="m-urgent">Закупщик получит уведомление сразу, без ожидания сбора заявок.</p>
+            </div>
+            <button class="sh-close" type="button" data-go="overview">Отмена</button>
+          </div>
+
+          <div class="urgentnote m-urgent">
+            <span class="urgentnote__ic"><svg class="sf sf--sm"><use href="#i-bolt"/></svg></span>
+            <p><b>Это не автоматическая покупка</b>Закупщик решит: выдать со склада, заказать или предложить замену. Ответ придёт сюда.</p>
+          </div>
+
+          <p class="label">Получатель</p>
+          <div class="chips" data-group="rcp3">
+            <button class="chip" type="button" aria-pressed="true">Кабинет 5</button>
+            <button class="chip" type="button" aria-pressed="false">Соколова Е. В.</button>
+            <button class="chip" type="button" aria-pressed="false">ЦСО</button>
+          </div>
+          <p class="note-plain">Одна заявка — один получатель.</p>
+
+          <p class="label">Направление</p>
+          <div class="chips" data-group="dir">
+            <button class="chip" type="button" aria-pressed="true">Терапия</button>
+            <button class="chip" type="button" aria-pressed="false">Ортопедия</button>
+            <button class="chip" type="button" aria-pressed="false">Ортодонтия</button>
+            <button class="chip" type="button" aria-pressed="false">Хирургия</button>
+            <button class="chip" type="button" aria-pressed="false">Общие</button>
+            <button class="chip" type="button" aria-pressed="false">Витрина</button>
+          </div>
+
+          <p class="label">Материал</p>
+          <label class="search"><svg class="sf"><use href="#i-search"/></svg><input type="text" value="эстелайт" aria-label="Поиск материала по названию, прежнему названию или артикулу" /><button class="search__clear" type="button" aria-label="Очистить"><svg class="sf sf--sm"><use href="#i-x"/></svg></button></label>
+          <div class="card results">
+            <div class="res"><span class="res__txt"><b>Estelite Asteria A2B</b><span>шприц 4 г · Терапия</span><span class="res__syn">найдено по прежнему названию «Эстелайт Астерия A2B»</span></span>
+              <button class="res__add" type="button" aria-pressed="false" aria-label="Добавить Estelite Asteria A2B"><svg class="sf sf--sm"><use href="#i-plus"/></svg></button></div>
+            <div class="res"><span class="res__txt"><b>Estelite Asteria A3B</b><span>шприц 4 г · Терапия</span></span>
+              <button class="res__add" type="button" aria-pressed="false" aria-label="Добавить Estelite Asteria A3B"><svg class="sf sf--sm"><use href="#i-plus"/></svg></button></div>
+          </div>
+          <button class="propose" type="button"><svg class="sf sf--sm"><use href="#i-plus"/></svg>Нет в списке — предложить новую позицию</button>
+
+          <p class="label">В заявке <b>2</b></p>
+          <div class="card">
+            <div class="line"><div class="line__top">
+              <span class="line__txt"><b>Перчатки нитриловые S</b><span>упаковка 100 шт.</span></span>
+              <span class="stepper"><button type="button" data-step="-1" aria-label="Меньше"><svg class="sf sf--sm"><use href="#i-minus"/></svg></button><output>2<small>уп.</small></output><button type="button" data-step="1" aria-label="Больше"><svg class="sf sf--sm"><use href="#i-plus"/></svg></button></span>
+            </div></div>
+            <div class="line"><div class="line__top">
+              <span class="line__txt"><b>Single Bond Universal</b><span>флакон 5 мл</span></span>
+            </div>
+              <div class="dup">
+                <p><b>Уже ожидаете 1 фл.</b> по заявке З-108 — поставка перенесена на 2 окт. Повторять не нужно.</p>
+                <div class="dup__acts"><button class="btn" type="button">Нужно дополнительно</button><button class="btn" type="button">Убрать</button></div>
+              </div></div>
+          </div>
+
+          <p class="label">Нужно к</p>
+          <div data-group="due">
+            <button class="due" type="button" aria-pressed="true"><span class="due__radio"></span><span class="due__t">Со сводкой недели</span><span class="due__h">к пн, 5 окт</span></button>
+            <button class="due" type="button" aria-pressed="false"><span class="due__radio"></span><span class="due__t">К конкретной дате<small>если нужно раньше или позже</small></span><svg class="sf sf--sm row__chev"><use href="#i-cal"/></svg></button>
+          </div>
+
+          <p class="label m-plan">Комментарий · необязательно</p>
+          <p class="label m-urgent">Почему срочно · необязательно</p>
+          <div class="ta">Например: «под пациента в четверг»</div>
+        </div>
+        <div class="sheet__cta">
+          <button class="cta m-plan" type="button" data-go="requests">Отправить заявку · 2 позиции</button>
+          <button class="cta cta--rec m-urgent" type="button" data-go="requests"><svg class="sf sf--sm"><use href="#i-bolt"/></svg>Отправить срочно</button>
+          <button class="cta--ghost m-plan" type="button">Сохранить черновик</button>
+          <p class="ctanote">Статус «отправлена» появится только после ответа сервера.</p>
+        </div>
+      </div>
+
+      <div class="homebar"></div>
+    </div>
+
+    <aside class="notes">
+      <section>
+        <h3>Что это</h3>
+        <p>Модуль «Материалы» в том же нативном языке, что «Мои задачи» v7 и «Ещё»: фон <code>signaloBg #EEF4FB</code>, карточки белые с обводкой <code>Line</code> r14, эйебрау JetBrains Mono, заголовок Manrope 26 semibold, сегменты и чипы <code>TealDeep #1B9E86</code>. Это не веб-кабинет на узком экране: внутри модуля нет своей нижней навигации и нет каталога.</p>
+        <p>Android — тот же язык (Color.kt — 1:1 hex c iOS), отличается только системная обвязка: M3 NavigationBar без пилюли, ExtendedFAB r16, ModalBottomSheet на Bg, «← НАЗАД», тап 48dp.</p>
+      </section>
+      <section>
+        <h3>На решение CEO</h3>
+        <ul>
+          <li>Вход — строкой в «Ещё» (как «Мои задачи»), таб-бар остаётся на 4 вкладках. Альтернатива — пятая вкладка.</li>
+          <li>Срочное обращение — тот же лист в срочном режиме, вход отдельной строкой на обзоре.</li>
+          <li>Бейдж на «Ещё» и «Материалах» считает только то, где нужно действие от ассистента (здесь — повторная подпись после правки закупщика), а не всё ожидающее.</li>
+          <li>Номер заявки «З-114» в Manrope читается как «3-114» — формат из ТЗ, нужен ли другой префикс?</li>
+        </ul>
+      </section>
+      <section>
+        <h3>Чего нет намеренно</h3>
+        <ul>
+          <li>Цен и денежных значений — ни на одном экране.</li>
+          <li>Чужих кабинетов: только разрешённые получатели (Кабинет 5, врач по поручению, ЦСО).</li>
+          <li>Слова «проведено» до ответа сервера (NET-01).</li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function () {
+  var phone = document.getElementById('phone');
+  var SCENES = [
+    { id: 'more',     label: '0 · Вход из «Ещё»',        screen: 'more' },
+    { id: 'overview', label: '1 · Обзор',                screen: 'overview', fab: 1 },
+    { id: 'new',      label: '2 · Новая заявка',         screen: 'overview', sheet: 1 },
+    { id: 'urgent',   label: '2б · Срочно',              screen: 'overview', sheet: 1, mode: 'urgent' },
+    { id: 'requests', label: '3 · Заявки',               screen: 'requests', fab: 1 },
+    { id: 'request',  label: '3б · Заявка и версии',     screen: 'request' },
+    { id: 'receive',  label: '4 · Получение: что взяли', screen: 'receive', tabbar: 0 },
+    { id: 'confirm',  label: '4б · Подпись',             screen: 'confirm', tabbar: 0 },
+    { id: 'sent',     label: '4в · Ждёт закупщика',      screen: 'sent', tabbar: 0 },
+    { id: 'offline',  label: '4г · Нет связи',           screen: 'confirm', tabbar: 0, net: 'off' },
+    { id: 'queue',    label: '5 · Ждут подписи',         screen: 'queue' },
+    { id: 'resign',   label: '5б · Повторная подпись',   screen: 'resign', tabbar: 0 },
+    { id: 'history',  label: '6 · История выдач',        screen: 'history', htab: 'iss' },
+    { id: 'tools',    label: '6б · Инструменты',         screen: 'history', htab: 'tools' },
+    { id: 'loading',  label: 'Загрузка',                 screen: 'loading' },
+    { id: 'empty',    label: 'Пусто',                    screen: 'empty' },
+    { id: 'error',    label: 'Ошибка',                   screen: 'error' },
+    { id: 'noaccess', label: 'Нет получателей',          screen: 'noaccess' }
+  ];
+  var byId = {}; SCENES.forEach(function (s) { byId[s.id] = s; });
+  var q = new URLSearchParams(location.search);
+  var state = { p: q.get('p') === 'android' ? 'android' : 'ios', s: byId[q.get('s')] ? q.get('s') : 'overview' };
+  if (q.get('long') === '1') { phone.classList.add('long'); document.body.classList.add('render'); }
+
+  function mkBtn(row, label, pressed, fn) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.textContent = label;
+    b.setAttribute('aria-pressed', pressed ? 'true' : 'false'); b.addEventListener('click', fn); row.appendChild(b); return b;
+  }
+  var platRow = document.getElementById('platRow'), sceneRow = document.getElementById('sceneRow');
+  function renderControls() {
+    platRow.querySelectorAll('.sw').forEach(function (b) { b.remove(); });
+    sceneRow.querySelectorAll('.sw').forEach(function (b) { b.remove(); });
+    mkBtn(platRow, 'iOS', state.p === 'ios', function () { state.p = 'ios'; apply(); });
+    mkBtn(platRow, 'Android', state.p === 'android', function () { state.p = 'android'; apply(); });
+    SCENES.forEach(function (s) { mkBtn(sceneRow, s.label, s.id === state.s, function () { state.s = s.id; apply(); }); });
+  }
+  function apply() {
+    var s = byId[state.s];
+    phone.dataset.p = state.p;
+    phone.dataset.sheet = s.sheet ? '1' : '0';
+    phone.dataset.mode = s.mode || '';
+    phone.dataset.tabbar = s.tabbar === 0 ? '0' : '1';
+    phone.dataset.net = s.net || '';
+    phone.dataset.fab = s.fab && !s.sheet ? '1' : '0';
+    phone.dataset.htab = s.htab || '';
+    phone.dataset.scene = s.id;
+    document.querySelectorAll('.screen').forEach(function (el) { el.classList.toggle('is-on', el.dataset.screen === s.screen); });
+    document.querySelectorAll('.bbar').forEach(function (el) { el.classList.toggle('is-on', el.dataset.for === s.screen); });
+    document.querySelectorAll('[data-group="htab"] button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.htab === (s.htab || 'iss') ? 'true' : 'false'); });
+    var on = document.querySelector('.screen.is-on'); if (on) on.scrollTop = 0;
+    renderControls();
+  }
+  document.addEventListener('click', function (e) {
+    var go = e.target.closest('[data-go]');
+    if (go && phone.contains(go)) { state.s = go.dataset.go; apply(); return; }
+    var ht = e.target.closest('[data-htab]');
+    if (ht && ht.tagName === 'BUTTON') { state.s = ht.dataset.htab === 'tools' ? 'tools' : 'history'; apply(); return; }
+    var chip = e.target.closest('[data-group] > button');
+    if (chip && chip.closest('[data-group]').dataset.group !== 'htab') {
+      chip.parentElement.querySelectorAll(':scope > button').forEach(function (b) { b.setAttribute('aria-pressed', b === chip ? 'true' : 'false'); });
+      return;
+    }
+    var chk = e.target.closest('.check, .res__add');
+    if (chk) { chk.setAttribute('aria-pressed', chk.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); return; }
+    var st = e.target.closest('[data-step]');
+    if (st) {
+      var out = st.parentElement.querySelector('output'); var unit = out.querySelector('small').outerHTML;
+      var n = Math.max(0, parseInt(out.textContent, 10) + parseInt(st.dataset.step, 10)); out.innerHTML = n + unit;
+    }
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && phone.dataset.sheet === '1') { state.s = 'overview'; apply(); } });
+  apply();
+})();
+</script>
+</body>
+</html>
